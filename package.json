@@ -9,9 +9,18 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@prisma/client": "^5.22.0",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/nodemailer": "^7.0.4",
+    "bcryptjs": "^3.0.3",
+    "jsonwebtoken": "^9.0.2",
     "next": "16.0.3",
+    "nodemailer": "^7.0.10",
+    "prisma": "^5.22.0",
     "react": "19.2.0",
-    "react-dom": "19.2.0"
+    "react-dom": "19.2.0",
+    "recharts": "^3.4.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
