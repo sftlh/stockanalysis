@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  stockanalysis:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=postgresql://admin:admin@host.docker.internal:5490/stock?schema=public
+      - EMAIL_SERVER_HOST=smtp.gmail.com
+      - EMAIL_SERVER_PORT=587
+      - EMAIL_SERVER_USER=saidfatahillah12@gmail.com
+      - EMAIL_SERVER_PASSWORD=tvuntxclnrikyflr
+      - EMAIL_FROM=Portfolio SF-Dev <noreply@sfdev.com>
+      - JWT_SECRET=klasjdlkhjKLASDJLKAJSDklajsdklasjKLDSJA3978q2648ydhjkas
+      - APP_URL=http://localhost:3000
