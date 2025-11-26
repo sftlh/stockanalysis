@@ -242,15 +242,15 @@ export default function StockCharts({ stocks }: StockChartsProps) {
     <div className="space-y-8">
       {/* Key Metrics Overview */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
+        <div className="bg-white border border-gray-300 p-6 card-flat">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Average PER</h3>
-          <div className="text-3xl font-bold text-green-600">
+          <div className="text-3xl font-bold text-blue-600">
             {averagePER.toFixed(2)}
           </div>
           <p className="text-sm text-gray-500 mt-1">Price-to-Earnings Ratio</p>
         </div>
 
-        <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
+        <div className="bg-white border border-gray-300 p-6 card-flat">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Average ROE</h3>
           <div className="text-3xl font-bold text-blue-600">
             {averageROE.toFixed(2)}%
@@ -258,9 +258,9 @@ export default function StockCharts({ stocks }: StockChartsProps) {
           <p className="text-sm text-gray-500 mt-1">Return on Equity</p>
         </div>
 
-        <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
+        <div className="bg-white border border-gray-300 p-6 card-flat">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Total Market Cap</h3>
-          <div className="text-3xl font-bold text-purple-600">
+          <div className="text-3xl font-bold text-blue-600">
             {formatCurrencyCompact(totalMarketCap * 1000000)}
           </div>
           <p className="text-sm text-gray-500 mt-1">Portfolio market value</p>
@@ -270,7 +270,7 @@ export default function StockCharts({ stocks }: StockChartsProps) {
       {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Debt-to-Equity Ratio Trends */}
-        <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
+        <div className="bg-white border border-gray-300 p-6 card-flat">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Debt-to-Equity Ratio Trends</h3>
           <div className="h-112">
             <ResponsiveContainer width="100%" height="100%">
@@ -308,7 +308,7 @@ export default function StockCharts({ stocks }: StockChartsProps) {
         </div>
 
         {/* Sector Distribution */}
-        <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
+        <div className="bg-white border border-gray-300 p-6 card-flat">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Sector Distribution</h3>
           <div className="h-80">
             <ResponsiveContainer width="100%" height="100%">
@@ -334,7 +334,7 @@ export default function StockCharts({ stocks }: StockChartsProps) {
         </div>
 
         {/* ROE vs PBV Analysis */}
-        <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
+        <div className="bg-white border border-gray-300 p-6 card-flat">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">ROE vs PBV Analysis</h3>
           <div className="h-80">
             <ResponsiveContainer width="100%" height="100%">
@@ -352,19 +352,19 @@ export default function StockCharts({ stocks }: StockChartsProps) {
         </div>
 
         {/* Laba Bersih Growth */}
-        <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
+        <div className="bg-white border border-gray-300 p-6 card-flat">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-gray-900">Laba Bersih Growth</h3>
             <div className="flex items-center gap-3">
               <span className="text-sm text-gray-600">Quarterly Growth</span>
               <button
                 onClick={() => setShowGrowth(!showGrowth)}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 ${
-                  showGrowth ? 'bg-green-600' : 'bg-gray-200'
+                className={`relative inline-flex h-6 w-11 items-center rounded transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+                  showGrowth ? 'bg-blue-500' : 'bg-gray-200'
                 }`}
               >
                 <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                  className={`inline-block h-4 w-4 transform rounded bg-white transition-transform ${
                     showGrowth ? 'translate-x-6' : 'translate-x-1'
                   }`}
                 />

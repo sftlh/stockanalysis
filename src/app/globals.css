@@ -25,6 +25,52 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+/* Flat UI Colors */
+.flat-primary { background-color: #4CAF50; color: white; }
+.flat-secondary { background-color: #2196F3; color: white; }
+.flat-success { background-color: #4CAF50; color: white; }
+.flat-info { background-color: #00BCD4; color: white; }
+.flat-warning { background-color: #FF9800; color: white; }
+.flat-danger { background-color: #F44336; color: white; }
+.flat-light { background-color: #F5F5F5; color: #333; }
+.flat-dark { background-color: #333; color: white; }
+
+/* Flat UI Button Styles */
+.btn-flat {
+  border: none;
+  border-radius: 2px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: none;
+}
+
+.btn-flat:hover {
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transform: translateY(-1px);
+}
+
+.btn-flat:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+/* Flat UI Card Styles */
+.card-flat {
+  background: white;
+  border: 1px solid #E0E0E0;
+  border-radius: 2px;
+  box-shadow: none;
+}
+
+.card-flat:hover {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
 /* Custom animations for loading states */
 .animation-delay-100 {
   animation-delay: 0.1s;

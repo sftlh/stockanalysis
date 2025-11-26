@@ -33,9 +33,9 @@ export default function VerifyForm() {
   }, [token, router])
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-md text-center">
-      <h2 className="text-2xl font-bold mb-4">Email Verification</h2>
-      <p>{message}</p>
+    <div className="bg-white p-6 border border-gray-300 w-full max-w-md text-center card-flat">
+      <h2 className="text-2xl font-bold mb-4 text-gray-800">Email Verification</h2>
+      <p className="text-gray-700">{message}</p>
     </div>
   )
 }

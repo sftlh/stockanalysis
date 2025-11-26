@@ -161,12 +161,12 @@ export default function StockFilters({ stocks, onFilteredStocksChange }: StockFi
   const activeFiltersCount = Object.values(filters).filter(value => value !== '').length
 
   return (
-    <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6 mb-6">
+    <div className="bg-white border border-gray-300 p-6 mb-6 card-flat">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
           <h3 className="text-lg font-semibold text-gray-900">Advanced Filters</h3>
           {activeFiltersCount > 0 && (
-            <span className="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+            <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded">
               {activeFiltersCount} active
             </span>
           )}
@@ -196,7 +196,7 @@ export default function StockFilters({ stocks, onFilteredStocksChange }: StockFi
             onFocus={() => setShowIssuerDropdown(true)}
             onBlur={() => setTimeout(() => setShowIssuerDropdown(false), 200)}
             placeholder="Type to search issuers..."
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           />
           {showIssuerDropdown && filteredIssuers.length > 0 && (
             <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-40 overflow-y-auto">
@@ -221,7 +221,7 @@ export default function StockFilters({ stocks, onFilteredStocksChange }: StockFi
           <select
             value={filters.sector}
             onChange={(e) => handleFilterChange('sector', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           >
             <option value="">All Sectors</option>
             {availableSectors.map((sector: string) => (
@@ -235,7 +235,7 @@ export default function StockFilters({ stocks, onFilteredStocksChange }: StockFi
           <select
             value={filters.year}
             onChange={(e) => handleFilterChange('year', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           >
             <option value="">All Years</option>
             {availableYears.map((year: number) => (
@@ -249,7 +249,7 @@ export default function StockFilters({ stocks, onFilteredStocksChange }: StockFi
           <select
             value={filters.quarter}
             onChange={(e) => handleFilterChange('quarter', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           >
             <option value="">All Quarters</option>
             <option value="1">Q1</option>
@@ -269,7 +269,7 @@ export default function StockFilters({ stocks, onFilteredStocksChange }: StockFi
               placeholder="Min"
               value={filters.minPER}
               onChange={(e) => handleFilterChange('minPER', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
             />
             <input
               type="number"
@@ -277,7 +277,7 @@ export default function StockFilters({ stocks, onFilteredStocksChange }: StockFi
               placeholder="Max"
               value={filters.maxPER}
               onChange={(e) => handleFilterChange('maxPER', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
             />
           </div>
         </div>
@@ -292,7 +292,7 @@ export default function StockFilters({ stocks, onFilteredStocksChange }: StockFi
               placeholder="Min"
               value={filters.minROE}
               onChange={(e) => handleFilterChange('minROE', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
             />
             <input
               type="number"
@@ -300,7 +300,7 @@ export default function StockFilters({ stocks, onFilteredStocksChange }: StockFi
               placeholder="Max"
               value={filters.maxROE}
               onChange={(e) => handleFilterChange('maxROE', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
             />
           </div>
         </div>
@@ -315,7 +315,7 @@ export default function StockFilters({ stocks, onFilteredStocksChange }: StockFi
               placeholder="Min"
               value={filters.minPBV}
               onChange={(e) => handleFilterChange('minPBV', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
             />
             <input
               type="number"
@@ -323,7 +323,7 @@ export default function StockFilters({ stocks, onFilteredStocksChange }: StockFi
               placeholder="Max"
               value={filters.maxPBV}
               onChange={(e) => handleFilterChange('maxPBV', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
             />
           </div>
         </div>
@@ -338,7 +338,7 @@ export default function StockFilters({ stocks, onFilteredStocksChange }: StockFi
               placeholder="Min"
               value={filters.minDER}
               onChange={(e) => handleFilterChange('minDER', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
             />
             <input
               type="number"
@@ -346,7 +346,7 @@ export default function StockFilters({ stocks, onFilteredStocksChange }: StockFi
               placeholder="Max"
               value={filters.maxDER}
               onChange={(e) => handleFilterChange('maxDER', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
             />
           </div>
         </div>

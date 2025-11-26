@@ -186,27 +186,27 @@ export default function SectorComparisonTable() {
     <div className="space-y-8">
       {/* Sector Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
+        <div className="bg-white border border-gray-300 p-6 card-flat">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600 uppercase tracking-wide">Total Sectors</p>
               <p className="text-3xl font-bold text-gray-900 mt-1">{sectorGroups.length}</p>
             </div>
-            <div className="bg-green-50 rounded-full p-3">
-              <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="bg-blue-100 rounded p-3">
+              <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
               </svg>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
+        <div className="bg-white border border-gray-300 p-6 card-flat">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600 uppercase tracking-wide">Total Stocks</p>
               <p className="text-3xl font-bold text-gray-900 mt-1">{stockData.length}</p>
             </div>
-            <div className="bg-blue-50 rounded-full p-3">
+            <div className="bg-blue-100 rounded p-3">
               <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
               </svg>
@@ -214,7 +214,7 @@ export default function SectorComparisonTable() {
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
+        <div className="bg-white border border-gray-300 p-6 card-flat">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600 uppercase tracking-wide">Avg Sector PER</p>
@@ -222,7 +222,7 @@ export default function SectorComparisonTable() {
                 {sectorGroups.length > 0 ? (sectorGroups.reduce((sum, group) => sum + group.sectorStats.avgPER, 0) / sectorGroups.length).toFixed(1) : '0.0'}
               </p>
             </div>
-            <div className="bg-purple-50 rounded-full p-3">
+            <div className="bg-purple-100 rounded p-3">
               <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
               </svg>
@@ -230,7 +230,7 @@ export default function SectorComparisonTable() {
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
+        <div className="bg-white border border-gray-300 p-6 card-flat">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600 uppercase tracking-wide">Avg Sector NPL</p>
@@ -238,7 +238,7 @@ export default function SectorComparisonTable() {
                 {sectorGroups.length > 0 ? (sectorGroups.reduce((sum, group) => sum + group.sectorStats.avgNPL, 0) / sectorGroups.length).toFixed(1) : '0.0'}%
               </p>
             </div>
-            <div className="bg-orange-50 rounded-full p-3">
+            <div className="bg-orange-100 rounded p-3">
               <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
@@ -249,8 +249,8 @@ export default function SectorComparisonTable() {
 
       {/* Sector Comparison Tables */}
       {sectorGroups.map((group) => (
-        <div key={group.sector} className="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
+        <div key={group.sector} className="bg-white border border-gray-300 overflow-hidden card-flat">
+          <div className="px-6 py-4 border-b border-gray-300 bg-gray-50">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-xl font-semibold text-gray-900">{group.sector}</h3>
@@ -260,7 +260,7 @@ export default function SectorComparisonTable() {
                 </p>
               </div>
               <div className="text-right">
-                <div className="text-2xl font-bold text-green-600">{group.sectorStats.totalStocks}</div>
+                <div className="text-2xl font-bold text-blue-600">{group.sectorStats.totalStocks}</div>
                 <div className="text-sm text-gray-500">companies</div>
               </div>
             </div>

@@ -59,13 +59,13 @@ export default function StockList({ stocks: propStocks }: StockListProps) {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-2xl shadow-2xl border-4 border-green-200 p-8">
+      <div className="bg-white border border-gray-300 p-8 card-flat">
         <div className="animate-pulse">
-          <div className="h-6 bg-green-200 rounded-xl w-1/3 mb-6"></div>
+          <div className="h-6 bg-gray-200 rounded w-1/3 mb-6"></div>
           <div className="space-y-4">
-            <div className="h-4 bg-green-100 rounded-xl"></div>
-            <div className="h-4 bg-green-100 rounded-xl"></div>
-            <div className="h-4 bg-green-100 rounded-xl"></div>
+            <div className="h-4 bg-gray-100 rounded"></div>
+            <div className="h-4 bg-gray-100 rounded"></div>
+            <div className="h-4 bg-gray-100 rounded"></div>
           </div>
         </div>
       </div>
@@ -73,36 +73,36 @@ export default function StockList({ stocks: propStocks }: StockListProps) {
   }
 
   return (
-    <div className="bg-white rounded-2xl shadow-2xl border-4 border-green-200 overflow-hidden transform hover:scale-105 transition-all duration-300">
-      <div className="px-8 py-6 border-b-4 border-green-200 bg-linear-to-r from-green-500 to-emerald-500">
-        <h3 className="text-2xl font-bold text-white mb-2 drop-shadow-lg">Stock Analysis Results</h3>
-        <p className="text-green-100 text-lg drop-shadow">Comprehensive financial analysis and key metrics</p>
+    <div className="bg-white border border-gray-300 overflow-hidden card-flat">
+      <div className="px-8 py-6 border-b border-gray-300 bg-gray-50">
+        <h3 className="text-2xl font-bold text-gray-800 mb-2">Stock Analysis Results</h3>
+        <p className="text-gray-600 text-lg">Comprehensive financial analysis and key metrics</p>
       </div>
       {stocks.length === 0 ? (
-        <div className="p-8 text-center text-green-600">
+        <div className="p-8 text-center text-gray-600">
           <p className="text-xl font-medium">No stock data available. Add your first record above.</p>
         </div>
       ) : (
         <>
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-green-200">
-              <thead className="bg-linear-to-r from-green-100 to-emerald-100">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-4 text-left text-sm font-bold text-green-800 uppercase tracking-wider">Issuer</th>
-                  <th className="px-6 py-4 text-left text-sm font-bold text-green-800 uppercase tracking-wider">Sector</th>
-                  <th className="px-6 py-4 text-left text-sm font-bold text-green-800 uppercase tracking-wider">Net Profit</th>
-                  <th className="px-6 py-4 text-left text-sm font-bold text-green-800 uppercase tracking-wider">EPS</th>
-                  <th className="px-6 py-4 text-left text-sm font-bold text-green-800 uppercase tracking-wider">PER</th>
-                  <th className="px-6 py-4 text-left text-sm font-bold text-green-800 uppercase tracking-wider">Book Value</th>
-                  <th className="px-6 py-4 text-left text-sm font-bold text-green-800 uppercase tracking-wider">PBV</th>
-                  <th className="px-6 py-4 text-left text-sm font-bold text-green-800 uppercase tracking-wider">ROE</th>
-                  <th className="px-6 py-4 text-left text-sm font-bold text-green-800 uppercase tracking-wider">DER</th>
-                  <th className="px-6 py-4 text-left text-sm font-bold text-green-800 uppercase tracking-wider">NPL</th>
-                  <th className="px-6 py-4 text-left text-sm font-bold text-green-800 uppercase tracking-wider">Quarter</th>
-                  <th className="px-6 py-4 text-left text-sm font-bold text-green-800 uppercase tracking-wider">Year</th>
+                  <th className="px-6 py-4 text-left text-sm font-bold text-gray-800 uppercase tracking-wider">Issuer</th>
+                  <th className="px-6 py-4 text-left text-sm font-bold text-gray-800 uppercase tracking-wider">Sector</th>
+                  <th className="px-6 py-4 text-left text-sm font-bold text-gray-800 uppercase tracking-wider">Net Profit</th>
+                  <th className="px-6 py-4 text-left text-sm font-bold text-gray-800 uppercase tracking-wider">EPS</th>
+                  <th className="px-6 py-4 text-left text-sm font-bold text-gray-800 uppercase tracking-wider">PER</th>
+                  <th className="px-6 py-4 text-left text-sm font-bold text-gray-800 uppercase tracking-wider">Book Value</th>
+                  <th className="px-6 py-4 text-left text-sm font-bold text-gray-800 uppercase tracking-wider">PBV</th>
+                  <th className="px-6 py-4 text-left text-sm font-bold text-gray-800 uppercase tracking-wider">ROE</th>
+                  <th className="px-6 py-4 text-left text-sm font-bold text-gray-800 uppercase tracking-wider">DER</th>
+                  <th className="px-6 py-4 text-left text-sm font-bold text-gray-800 uppercase tracking-wider">NPL</th>
+                  <th className="px-6 py-4 text-left text-sm font-bold text-gray-800 uppercase tracking-wider">Quarter</th>
+                  <th className="px-6 py-4 text-left text-sm font-bold text-gray-800 uppercase tracking-wider">Year</th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-green-100">
+              <tbody className="bg-white divide-y divide-gray-100">
                 {paginatedStocks.map((stock) => {
                   const per = stock.eps !== 0 ? (stock.currentPrice / stock.eps).toFixed(2) : 'N/A'
                   const bookValue = stock.outstandingShares !== 0 ? (stock.totalEquity / stock.outstandingShares).toFixed(2) : 'N/A'
@@ -112,19 +112,19 @@ export default function StockList({ stocks: propStocks }: StockListProps) {
                   const npl = stock.totalDebt !== 0 ? ((stock.netProfit / stock.totalDebt) * 100).toFixed(2) + '%' : 'N/A'
 
                   return (
-                    <tr key={stock.id} className="hover:bg-green-50 transition-colors duration-200">
+                    <tr key={stock.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap text-lg font-semibold text-gray-900">{stock.issuerName}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-lg text-green-700 font-medium">{stock.sector || 'N/A'}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-lg text-green-700 font-medium">{formatCurrency(stock.netProfit)}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-lg text-green-700 font-medium">{formatCurrency(stock.eps)}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-lg text-green-700 font-medium">{per}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-lg text-green-700 font-medium">{bookValue !== 'N/A' ? formatCurrency(parseFloat(bookValue)) : bookValue}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-lg text-green-700 font-medium">{pbv}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-lg text-green-700 font-medium">{roe}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-lg text-green-700 font-medium">{der}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-lg text-green-700 font-medium">{npl}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-lg text-green-700 font-medium">Q{stock.quarter}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-lg text-green-700 font-medium">{stock.year}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-lg text-gray-700 font-medium">{stock.sector || 'N/A'}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-lg text-gray-700 font-medium">{formatCurrency(stock.netProfit)}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-lg text-gray-700 font-medium">{formatCurrency(stock.eps)}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-lg text-gray-700 font-medium">{per}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-lg text-gray-700 font-medium">{bookValue !== 'N/A' ? formatCurrency(parseFloat(bookValue)) : bookValue}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-lg text-gray-700 font-medium">{pbv}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-lg text-gray-700 font-medium">{roe}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-lg text-gray-700 font-medium">{der}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-lg text-gray-700 font-medium">{npl}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-lg text-gray-700 font-medium">Q{stock.quarter}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-lg text-gray-700 font-medium">{stock.year}</td>
                     </tr>
                   )
                 })}
@@ -134,25 +134,25 @@ export default function StockList({ stocks: propStocks }: StockListProps) {
 
           {/* Pagination */}
           {stocks.length > itemsPerPage && (
-            <div className="flex items-center justify-between mt-6 px-6 py-4 bg-green-50 rounded-lg border border-green-200">
-              <div className="text-sm text-green-700 font-medium">
+            <div className="flex items-center justify-between mt-6 px-6 py-4 bg-gray-50 border-t border-gray-300">
+              <div className="text-sm text-gray-700 font-medium">
                 Showing {startIndex + 1} to {Math.min(startIndex + itemsPerPage, stocks.length)} of {stocks.length} results
               </div>
               <div className="flex items-center space-x-3">
                 <button
                   onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                   disabled={currentPage === 1}
-                  className="px-4 py-2 text-sm font-medium text-green-700 bg-white border border-green-300 rounded-md hover:bg-green-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Previous
                 </button>
-                <span className="text-sm text-green-700 font-medium">
+                <span className="text-sm text-gray-700 font-medium">
                   Page {currentPage} of {totalPages}
                 </span>
                 <button
                   onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
                   disabled={currentPage === totalPages}
-                  className="px-4 py-2 text-sm font-medium text-green-700 bg-white border border-green-300 rounded-md hover:bg-green-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Next
                 </button>

@@ -47,22 +47,22 @@ export default function ResetPasswordForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white p-8 rounded-lg shadow-lg border border-green-200 w-full max-w-md">
-      <h2 className="text-2xl font-bold mb-6 text-green-800">Reset Password</h2>
+    <form onSubmit={handleSubmit} className="bg-white p-8 border border-gray-300 w-full max-w-md card-flat">
+      <h2 className="text-2xl font-bold mb-6 text-gray-800">Reset Password</h2>
       <div className="mb-4">
-        <label className="block text-sm font-medium mb-2 text-green-700">New Password</label>
+        <label className="block text-sm font-medium mb-2 text-gray-700">New Password</label>
         <input
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
-          className="w-full px-3 py-2 border border-green-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-green-50"
+          className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
         />
       </div>
-      <button type="submit" disabled={loading} className="w-full bg-linear-to-r from-green-600 to-emerald-600 text-white py-2 px-4 rounded-md hover:from-green-700 hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors font-medium disabled:opacity-50 shadow-md">
+      <button type="submit" disabled={loading} className="w-full bg-blue-500 text-white py-2 px-4 rounded btn-flat disabled:opacity-50">
         {loading ? 'Resetting...' : 'Reset Password'}
       </button>
-      {message && <p className="mt-4 text-center text-sm font-medium text-green-700">{message}</p>}
+      {message && <p className="mt-4 text-center text-sm font-medium text-gray-700">{message}</p>}
     </form>
   )
 }
