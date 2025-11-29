@@ -226,14 +226,14 @@ export default function StockCharts({ stocks }: StockChartsProps) {
 
   if (stocks.length === 0) {
     return (
-      <div className="bg-white rounded-lg shadow-md border border-gray-200 p-8 text-center">
-        <div className="text-gray-500">
-          <svg className="w-16 h-16 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div className="glass-card card-modern p-12 text-center">
+        <div className="mb-6">
+          <svg className="w-20 h-20 text-white/30 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
           </svg>
-          <p className="text-lg font-medium">No data available for visualization</p>
-          <p className="text-sm">Add stock data to see charts and analytics</p>
         </div>
+        <h4 className="text-xl font-semibold text-white mb-2">No Data Available for Visualization</h4>
+        <p className="text-white/60 text-lg">Add stock data to see charts and analytics</p>
       </div>
     )
   }
@@ -241,41 +241,68 @@ export default function StockCharts({ stocks }: StockChartsProps) {
   return (
     <div className="space-y-8">
       {/* Key Metrics Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white border border-gray-300 p-6 card-flat">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Average PER</h3>
-          <div className="text-3xl font-bold text-blue-600">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="glass-card card-modern p-8 fade-in-up">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h3 className="text-xl font-bold text-white mb-2">Average PER</h3>
+              <p className="text-white/70">Price-to-Earnings Ratio</p>
+            </div>
+            <div className="bg-blue-500/20 rounded-xl p-4">
+              <svg className="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+              </svg>
+            </div>
+          </div>
+          <div className="text-4xl font-bold gradient-text">
             {averagePER.toFixed(2)}
           </div>
-          <p className="text-sm text-gray-500 mt-1">Price-to-Earnings Ratio</p>
         </div>
 
-        <div className="bg-white border border-gray-300 p-6 card-flat">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Average ROE</h3>
-          <div className="text-3xl font-bold text-blue-600">
+        <div className="glass-card card-modern p-8 fade-in-up animation-delay-100">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h3 className="text-xl font-bold text-white mb-2">Average ROE</h3>
+              <p className="text-white/70">Return on Equity</p>
+            </div>
+            <div className="bg-green-500/20 rounded-xl p-4">
+              <svg className="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+          </div>
+          <div className="text-4xl font-bold gradient-text">
             {averageROE.toFixed(2)}%
           </div>
-          <p className="text-sm text-gray-500 mt-1">Return on Equity</p>
         </div>
 
-        <div className="bg-white border border-gray-300 p-6 card-flat">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Total Market Cap</h3>
-          <div className="text-3xl font-bold text-blue-600">
+        <div className="glass-card card-modern p-8 fade-in-up animation-delay-200">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h3 className="text-xl font-bold text-white mb-2">Total Market Cap</h3>
+              <p className="text-white/70">Portfolio market value</p>
+            </div>
+            <div className="bg-purple-500/20 rounded-xl p-4">
+              <svg className="w-8 h-8 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+              </svg>
+            </div>
+          </div>
+          <div className="text-4xl font-bold gradient-text">
             {formatCurrencyCompact(totalMarketCap * 1000000)}
           </div>
-          <p className="text-sm text-gray-500 mt-1">Portfolio market value</p>
         </div>
       </div>
 
       {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Debt-to-Equity Ratio Trends */}
-        <div className="bg-white border border-gray-300 p-6 card-flat">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Debt-to-Equity Ratio Trends</h3>
+        <div className="glass-card card-modern p-8 fade-in-up animation-delay-300">
+          <h3 className="text-2xl font-bold text-white mb-6">Debt-to-Equity Ratio Trends</h3>
           <div className="h-112">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={derTrendsData} margin={{ top: 20, right: 30, left: 20, bottom: 80 }}>
-                <CartesianGrid strokeDasharray="3 3" />
+                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
                 <XAxis
                   dataKey="period"
                   angle={-45}
@@ -283,11 +310,18 @@ export default function StockCharts({ stocks }: StockChartsProps) {
                   height={100}
                   interval={xAxisInterval}
                   fontSize={12}
+                  stroke="#9CA3AF"
                 />
-                <YAxis label={{ value: 'DER (%)', angle: -90, position: 'insideLeft' }} />
+                <YAxis label={{ value: 'DER (%)', angle: -90, position: 'insideLeft', fill: '#9CA3AF' }} stroke="#9CA3AF" />
                 <Tooltip
                   formatter={(value: number) => [`${value.toFixed(2)}%`, 'DER']}
                   labelFormatter={(label) => `Period: ${label}`}
+                  contentStyle={{
+                    backgroundColor: '#1F2937',
+                    border: '1px solid #374151',
+                    borderRadius: '8px',
+                    color: '#F9FAFB'
+                  }}
                 />
                 <Legend />
                 {uniqueIssuers.map((issuer, index) => (
@@ -308,8 +342,8 @@ export default function StockCharts({ stocks }: StockChartsProps) {
         </div>
 
         {/* Sector Distribution */}
-        <div className="bg-white border border-gray-300 p-6 card-flat">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Sector Distribution</h3>
+        <div className="glass-card card-modern p-8 fade-in-up animation-delay-400">
+          <h3 className="text-2xl font-bold text-white mb-6">Sector Distribution</h3>
           <div className="h-80">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
@@ -327,22 +361,36 @@ export default function StockCharts({ stocks }: StockChartsProps) {
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
-                <Tooltip />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: '#1F2937',
+                    border: '1px solid #374151',
+                    borderRadius: '8px',
+                    color: '#F9FAFB'
+                  }}
+                />
               </PieChart>
             </ResponsiveContainer>
           </div>
         </div>
 
         {/* ROE vs PBV Analysis */}
-        <div className="bg-white border border-gray-300 p-6 card-flat">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">ROE vs PBV Analysis</h3>
+        <div className="glass-card card-modern p-8 fade-in-up animation-delay-500">
+          <h3 className="text-2xl font-bold text-white mb-6">ROE vs PBV Analysis</h3>
           <div className="h-80">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="issuer" />
-                <YAxis />
-                <Tooltip />
+                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                <XAxis dataKey="issuer" stroke="#9CA3AF" />
+                <YAxis stroke="#9CA3AF" />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: '#1F2937',
+                    border: '1px solid #374151',
+                    borderRadius: '8px',
+                    color: '#F9FAFB'
+                  }}
+                />
                 <Legend />
                 <Bar dataKey="roe" fill="#059669" name="ROE (%)" />
                 <Bar dataKey="pbv" fill="#10B981" name="PBV" />
@@ -352,32 +400,32 @@ export default function StockCharts({ stocks }: StockChartsProps) {
         </div>
 
         {/* Laba Bersih Growth */}
-        <div className="bg-white border border-gray-300 p-6 card-flat">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">Laba Bersih Growth</h3>
-            <div className="flex items-center gap-3">
-              <span className="text-sm text-gray-600">Quarterly Growth</span>
+        <div className="glass-card card-modern p-8 fade-in-up animation-delay-600">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-2xl font-bold text-white">Laba Bersih Growth</h3>
+            <div className="flex items-center gap-4 bg-white/10 rounded-xl p-2">
+              <span className={`text-sm font-medium transition-colors ${!showGrowth ? 'text-white' : 'text-white/60'}`}>Quarterly Growth</span>
               <button
                 onClick={() => setShowGrowth(!showGrowth)}
-                className={`relative inline-flex h-6 w-11 items-center rounded transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
-                  showGrowth ? 'bg-blue-500' : 'bg-gray-200'
+                className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-white/50 ${
+                  showGrowth ? 'bg-gradient-to-r from-blue-500 to-purple-500' : 'bg-white/20'
                 }`}
               >
                 <span
-                  className={`inline-block h-4 w-4 transform rounded bg-white transition-transform ${
+                  className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-lg transition-transform ${
                     showGrowth ? 'translate-x-6' : 'translate-x-1'
                   }`}
                 />
               </button>
-              <span className="text-sm text-gray-600">Absolute Value</span>
+              <span className={`text-sm font-medium transition-colors ${showGrowth ? 'text-white' : 'text-white/60'}`}>Absolute Value</span>
             </div>
           </div>
           <div className="h-80">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={showGrowth ? netProfitGrowthData : chartData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="period" />
-                <YAxis />
+                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                <XAxis dataKey="period" stroke="#9CA3AF" />
+                <YAxis stroke="#9CA3AF" />
                 <Tooltip
                   formatter={(value: number, name: string) => [
                     showGrowth
@@ -385,6 +433,12 @@ export default function StockCharts({ stocks }: StockChartsProps) {
                       : formatCurrency(value),
                     showGrowth ? `${name} Growth (%)` : 'Net Profit'
                   ]}
+                  contentStyle={{
+                    backgroundColor: '#1F2937',
+                    border: '1px solid #374151',
+                    borderRadius: '8px',
+                    color: '#F9FAFB'
+                  }}
                 />
                 <Legend />
                 {showGrowth ? (

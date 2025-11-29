@@ -33,9 +33,15 @@ export default function VerifyForm() {
   }, [token, router])
 
   return (
-    <div className="bg-white p-6 border border-gray-300 w-full max-w-md text-center card-flat">
-      <h2 className="text-2xl font-bold mb-4 text-gray-800">Email Verification</h2>
-      <p className="text-gray-700">{message}</p>
+    <div className="glass-card card-modern p-12 w-full max-w-md text-center fade-in-up">
+      <div className="mb-8">
+        <div className="relative mb-6">
+          <div className="animate-spin rounded-full h-12 w-12 border-4 border-white border-t-transparent shadow-2xl mx-auto"></div>
+          <div className="absolute inset-0 rounded-full border-4 border-white/30 border-t-transparent animate-spin animation-delay-300 opacity-75"></div>
+        </div>
+        <h2 className="text-3xl font-bold gradient-text mb-2">Email Verification</h2>
+        <p className="text-white/70">{message}</p>
+      </div>
     </div>
   )
 }

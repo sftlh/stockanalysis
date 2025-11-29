@@ -161,19 +161,27 @@ export default function StockFilters({ stocks, onFilteredStocksChange }: StockFi
   const activeFiltersCount = Object.values(filters).filter(value => value !== '').length
 
   return (
-    <div className="bg-white border border-gray-300 p-6 mb-6 card-flat">
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-3">
-          <h3 className="text-lg font-semibold text-gray-900">Advanced Filters</h3>
+    <div className="glass-card card-modern p-8 mb-8">
+      <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center gap-4">
+          <div className="bg-white/10 rounded-xl p-3">
+            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+            </svg>
+          </div>
+          <div>
+            <h3 className="text-2xl font-bold text-white mb-1">Advanced Filters</h3>
+            <p className="text-white/70">Refine your stock analysis with precision filters</p>
+          </div>
           {activeFiltersCount > 0 && (
-            <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded">
+            <span className="bg-gradient-to-r from-blue-500 to-purple-500 text-white text-sm font-bold px-4 py-2 rounded-xl shadow-lg">
               {activeFiltersCount} active
             </span>
           )}
         </div>
         <button
           onClick={clearFilters}
-          className="text-gray-600 hover:text-gray-900 text-sm font-medium flex items-center gap-1"
+          className="btn-outline flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all duration-300 hover:scale-105"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -185,7 +193,7 @@ export default function StockFilters({ stocks, onFilteredStocksChange }: StockFi
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {/* Basic Filters */}
         <div className="relative">
-          <label className="block text-sm font-medium text-gray-700 mb-2">Issuer Name</label>
+          <label className="block text-sm font-semibold text-white/90 mb-3">Issuer Name</label>
           <input
             type="text"
             value={filters.issuerName}
@@ -196,10 +204,10 @@ export default function StockFilters({ stocks, onFilteredStocksChange }: StockFi
             onFocus={() => setShowIssuerDropdown(true)}
             onBlur={() => setTimeout(() => setShowIssuerDropdown(false), 200)}
             placeholder="Type to search issuers..."
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-white/50 transition-all duration-300"
           />
           {showIssuerDropdown && filteredIssuers.length > 0 && (
-            <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-40 overflow-y-auto">
+            <div className="absolute z-20 w-full mt-2 bg-gray-800/95 backdrop-blur-sm border border-white/20 rounded-xl shadow-2xl max-h-48 overflow-y-auto">
               {filteredIssuers.map((issuer) => (
                 <div
                   key={issuer}
@@ -207,7 +215,7 @@ export default function StockFilters({ stocks, onFilteredStocksChange }: StockFi
                     handleFilterChange('issuerName', issuer)
                     setShowIssuerDropdown(false)
                   }}
-                  className="px-3 py-2 hover:bg-gray-100 cursor-pointer text-sm"
+                  className="px-4 py-3 hover:bg-white/10 cursor-pointer text-white/90 text-sm transition-colors duration-200 first:rounded-t-xl last:rounded-b-xl"
                 >
                   {issuer}
                 </div>
@@ -217,59 +225,59 @@ export default function StockFilters({ stocks, onFilteredStocksChange }: StockFi
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Sector</label>
+          <label className="block text-sm font-semibold text-white/90 mb-3">Sector</label>
           <select
             value={filters.sector}
             onChange={(e) => handleFilterChange('sector', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-white/50 transition-all duration-300"
           >
-            <option value="">All Sectors</option>
+            <option value="" className="bg-gray-800 text-white">All Sectors</option>
             {availableSectors.map((sector: string) => (
-              <option key={sector} value={sector}>{sector}</option>
+              <option key={sector} value={sector} className="bg-gray-800 text-white">{sector}</option>
             ))}
           </select>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Year</label>
+          <label className="block text-sm font-semibold text-white/90 mb-3">Year</label>
           <select
             value={filters.year}
             onChange={(e) => handleFilterChange('year', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-white/50 transition-all duration-300"
           >
-            <option value="">All Years</option>
+            <option value="" className="bg-gray-800 text-white">All Years</option>
             {availableYears.map((year: number) => (
-              <option key={year} value={year}>{year}</option>
+              <option key={year} value={year} className="bg-gray-800 text-white">{year}</option>
             ))}
           </select>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Quarter</label>
+          <label className="block text-sm font-semibold text-white/90 mb-3">Quarter</label>
           <select
             value={filters.quarter}
             onChange={(e) => handleFilterChange('quarter', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-white/50 transition-all duration-300"
           >
-            <option value="">All Quarters</option>
-            <option value="1">Q1</option>
-            <option value="2">Q2</option>
-            <option value="3">Q3</option>
-            <option value="4">Q4</option>
+            <option value="" className="bg-gray-800 text-white">All Quarters</option>
+            <option value="1" className="bg-gray-800 text-white">Q1</option>
+            <option value="2" className="bg-gray-800 text-white">Q2</option>
+            <option value="3" className="bg-gray-800 text-white">Q3</option>
+            <option value="4" className="bg-gray-800 text-white">Q4</option>
           </select>
         </div>
 
         {/* PER Range */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">PER Range</label>
-          <div className="flex gap-2">
+          <label className="block text-sm font-semibold text-white/90 mb-3">PER Range</label>
+          <div className="flex gap-3">
             <input
               type="number"
               step="0.1"
               placeholder="Min"
               value={filters.minPER}
               onChange={(e) => handleFilterChange('minPER', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+              className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-white/50 transition-all duration-300 text-sm"
             />
             <input
               type="number"
@@ -277,22 +285,22 @@ export default function StockFilters({ stocks, onFilteredStocksChange }: StockFi
               placeholder="Max"
               value={filters.maxPER}
               onChange={(e) => handleFilterChange('maxPER', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+              className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-white/50 transition-all duration-300 text-sm"
             />
           </div>
         </div>
 
         {/* ROE Range */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">ROE Range (%)</label>
-          <div className="flex gap-2">
+          <label className="block text-sm font-semibold text-white/90 mb-3">ROE Range (%)</label>
+          <div className="flex gap-3">
             <input
               type="number"
               step="0.1"
               placeholder="Min"
               value={filters.minROE}
               onChange={(e) => handleFilterChange('minROE', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+              className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-white/50 transition-all duration-300 text-sm"
             />
             <input
               type="number"
@@ -300,22 +308,22 @@ export default function StockFilters({ stocks, onFilteredStocksChange }: StockFi
               placeholder="Max"
               value={filters.maxROE}
               onChange={(e) => handleFilterChange('maxROE', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+              className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-white/50 transition-all duration-300 text-sm"
             />
           </div>
         </div>
 
         {/* PBV Range */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">PBV Range</label>
-          <div className="flex gap-2">
+          <label className="block text-sm font-semibold text-white/90 mb-3">PBV Range</label>
+          <div className="flex gap-3">
             <input
               type="number"
               step="0.1"
               placeholder="Min"
               value={filters.minPBV}
               onChange={(e) => handleFilterChange('minPBV', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+              className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-white/50 transition-all duration-300 text-sm"
             />
             <input
               type="number"
@@ -323,22 +331,22 @@ export default function StockFilters({ stocks, onFilteredStocksChange }: StockFi
               placeholder="Max"
               value={filters.maxPBV}
               onChange={(e) => handleFilterChange('maxPBV', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+              className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-white/50 transition-all duration-300 text-sm"
             />
           </div>
         </div>
 
         {/* DER Range */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">DER Range (%)</label>
-          <div className="flex gap-2">
+          <label className="block text-sm font-semibold text-white/90 mb-3">DER Range (%)</label>
+          <div className="flex gap-3">
             <input
               type="number"
               step="0.1"
               placeholder="Min"
               value={filters.minDER}
               onChange={(e) => handleFilterChange('minDER', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+              className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-white/50 transition-all duration-300 text-sm"
             />
             <input
               type="number"
@@ -346,7 +354,7 @@ export default function StockFilters({ stocks, onFilteredStocksChange }: StockFi
               placeholder="Max"
               value={filters.maxDER}
               onChange={(e) => handleFilterChange('maxDER', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+              className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-white/50 transition-all duration-300 text-sm"
             />
           </div>
         </div>
@@ -354,35 +362,53 @@ export default function StockFilters({ stocks, onFilteredStocksChange }: StockFi
 
       {/* Filter Summary */}
       {activeFiltersCount > 0 && (
-        <div className="mt-4 pt-4 border-t border-gray-200">
-          <div className="flex flex-wrap gap-2">
+        <div className="mt-8 pt-6 border-t border-white/10">
+          <div className="flex flex-wrap gap-3">
             {filters.issuerName && (
-              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+              <span className="inline-flex items-center px-4 py-2 rounded-xl text-sm font-semibold bg-red-500/20 text-red-300 border border-red-500/30">
+                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
                 Issuer: {filters.issuerName}
               </span>
             )}
             {filters.sector && (
-              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+              <span className="inline-flex items-center px-4 py-2 rounded-xl text-sm font-semibold bg-green-500/20 text-green-300 border border-green-500/30">
+                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
                 Sector: {filters.sector}
               </span>
             )}
             {filters.year && (
-              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+              <span className="inline-flex items-center px-4 py-2 rounded-xl text-sm font-semibold bg-blue-500/20 text-blue-300 border border-blue-500/30">
+                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
                 Year: {filters.year}
               </span>
             )}
             {filters.quarter && (
-              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+              <span className="inline-flex items-center px-4 py-2 rounded-xl text-sm font-semibold bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
                 Quarter: Q{filters.quarter}
               </span>
             )}
             {(filters.minPER || filters.maxPER) && (
-              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+              <span className="inline-flex items-center px-4 py-2 rounded-xl text-sm font-semibold bg-yellow-500/20 text-yellow-300 border border-yellow-500/30">
+                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                </svg>
                 PER: {filters.minPER || '0'} - {filters.maxPER || '∞'}
               </span>
             )}
             {(filters.minROE || filters.maxROE) && (
-              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+              <span className="inline-flex items-center px-4 py-2 rounded-xl text-sm font-semibold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
                 ROE: {filters.minROE || '0'}% - {filters.maxROE || '∞'}%
               </span>
             )}
