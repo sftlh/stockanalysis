@@ -98,6 +98,7 @@ export default function StockList({ stocks: propStocks }: StockListProps) {
                   <th className="px-6 py-4 text-left text-sm font-bold text-white/80 uppercase tracking-wider">Sector</th>
                   <th className="px-6 py-4 text-left text-sm font-bold text-white/80 uppercase tracking-wider">Net Profit</th>
                   <th className="px-6 py-4 text-left text-sm font-bold text-white/80 uppercase tracking-wider">EPS</th>
+                  <th className="px-6 py-4 text-left text-sm font-bold text-white/80 uppercase tracking-wider">Outstanding Shares</th>
                   <th className="px-6 py-4 text-left text-sm font-bold text-white/80 uppercase tracking-wider">PER</th>
                   <th className="px-6 py-4 text-left text-sm font-bold text-white/80 uppercase tracking-wider">Book Value</th>
                   <th className="px-6 py-4 text-left text-sm font-bold text-white/80 uppercase tracking-wider">PBV</th>
@@ -123,6 +124,7 @@ export default function StockList({ stocks: propStocks }: StockListProps) {
                       <td className="px-6 py-4 whitespace-nowrap text-lg text-white/90 font-medium">{stock.sector || 'N/A'}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-lg text-white/90 font-medium">{formatCurrency(stock.netProfit)}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-lg text-white/90 font-medium">{formatCurrency(stock.eps)}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-lg text-white/90 font-medium">{stock.outstandingShares.toLocaleString()}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-lg text-white/90 font-medium">{per}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-lg text-white/90 font-medium">{bookValue !== 'N/A' ? formatCurrency(parseFloat(bookValue)) : bookValue}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-lg text-white/90 font-medium">{pbv}</td>

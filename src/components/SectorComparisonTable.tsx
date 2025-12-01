@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
+import { formatCurrencyCompact } from '@/lib/currency';
 
 interface StockData {
   id: number;
@@ -43,6 +44,16 @@ export default function SectorComparisonTable() {
   const [stockData, setStockData] = useState<StockData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [filters, setFilters] = useState({
+    sector: '',
+    liner: '',
+    minMarketCap: '',
+    maxMarketCap: '',
+    minPER: '',
+    maxPER: '',
+    minROE: '',
+    maxROE: ''
+  });
 
   useEffect(() => {
     const fetchStockData = async () => {
@@ -61,11 +72,71 @@ export default function SectorComparisonTable() {
     fetchStockData();
   }, []);
 
+  const uniqueSectors = useMemo(() => {
+    const sectors = new Set(stockData.map(stock => stock.sector));
+    return Array.from(sectors).sort();
+  }, [stockData]);
+
   const sectorGroups = useMemo(() => {
+    // Apply filters first
+    let filteredData = [...stockData];
+
+    // Sector filter
+    if (filters.sector) {
+      filteredData = filteredData.filter(stock => stock.sector === filters.sector);
+    }
+
+    // Liner filter
+    if (filters.liner) {
+      filteredData = filteredData.filter(stock => {
+        const marketCap = stock.currentPrice * stock.outstandingShares;
+        if (filters.liner === 'Blue Chip') {
+          return marketCap >= 10_000_000_000_000; // >= Rp10T
+        } else if (filters.liner === 'Second Liner') {
+          return marketCap >= 1_000_000_000_000 && marketCap < 10_000_000_000_000; // Rp1T - Rp10T
+        } else if (filters.liner === 'Third Liner') {
+          return marketCap < 1_000_000_000_000; // < Rp1T
+        }
+        return true;
+      });
+    }
+
+    // Market Cap filter
+    if (filters.minMarketCap || filters.maxMarketCap) {
+      filteredData = filteredData.filter(stock => {
+        const marketCap = stock.currentPrice * stock.outstandingShares;
+        const minCap = filters.minMarketCap ? parseFloat(filters.minMarketCap) * 1_000_000_000_000 : 0; // Convert to trillions
+        const maxCap = filters.maxMarketCap ? parseFloat(filters.maxMarketCap) * 1_000_000_000_000 : Infinity;
+        return marketCap >= minCap && marketCap <= maxCap;
+      });
+    }
+
+    // PER filter
+    if (filters.minPER || filters.maxPER) {
+      filteredData = filteredData.filter(stock => {
+        if (stock.eps === 0) return false;
+        const per = stock.currentPrice / stock.eps;
+        const minPER = filters.minPER ? parseFloat(filters.minPER) : -Infinity;
+        const maxPER = filters.maxPER ? parseFloat(filters.maxPER) : Infinity;
+        return per >= minPER && per <= maxPER;
+      });
+    }
+
+    // ROE filter
+    if (filters.minROE || filters.maxROE) {
+      filteredData = filteredData.filter(stock => {
+        if (stock.totalEquity === 0) return false;
+        const roe = (stock.netProfit / stock.totalEquity) * 100;
+        const minROE = filters.minROE ? parseFloat(filters.minROE) : -Infinity;
+        const maxROE = filters.maxROE ? parseFloat(filters.maxROE) : Infinity;
+        return roe >= minROE && roe <= maxROE;
+      });
+    }
+
     // First, group by issuer and get the latest data for each issuer
     const issuerMap = new Map<string, StockData>();
 
-    stockData.forEach(stock => {
+    filteredData.forEach(stock => {
       const existing = issuerMap.get(stock.issuerName);
       if (!existing ||
           existing.year < stock.year ||
@@ -144,6 +215,18 @@ export default function SectorComparisonTable() {
     // Consider it good if it meets at least 3 out of 4 criteria
     const criteriaMet = [goodPER, goodROE, goodDER, goodPBV].filter(Boolean).length
     return criteriaMet >= 3
+  }
+
+  const getLinerClassification = (stock: StockData) => {
+    const marketCap = stock.currentPrice * stock.outstandingShares
+
+    if (marketCap >= 10_000_000_000_000) { // Rp10 trillion or more
+      return 'Blue Chip'
+    } else if (marketCap >= 1_000_000_000_000) { // Rp1 trillion to Rp10 trillion
+      return 'Second Liner'
+    } else { // Below Rp1 trillion
+      return 'Third Liner'
+    }
   }
 
   const formatCurrencyCompact = (value: number) => {
@@ -271,6 +354,124 @@ export default function SectorComparisonTable() {
         </div>
       </div>
 
+      {/* Filters Section */}
+      <div className="glass-card card-modern p-8 fade-in-up animation-delay-300">
+        <h3 className="text-xl font-bold text-white mb-6">Filters</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {/* Sector Filter */}
+          <div>
+            <label className="block text-sm font-medium text-white/80 mb-3">Sector</label>
+            <select
+              value={filters.sector}
+              onChange={(e) => setFilters(prev => ({ ...prev, sector: e.target.value }))}
+              className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+            >
+              <option value="">All Sectors</option>
+              {uniqueSectors.map(sector => (
+                <option key={sector} value={sector}>{sector}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Liner Filter */}
+          <div>
+            <label className="block text-sm font-medium text-white/80 mb-3">Liner Classification</label>
+            <select
+              value={filters.liner}
+              onChange={(e) => setFilters(prev => ({ ...prev, liner: e.target.value }))}
+              className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+            >
+              <option value="">All Liners</option>
+              <option value="Blue Chip">Blue Chip (≥Rp10T)</option>
+              <option value="Second Liner">Second Liner (Rp1T-Rp10T)</option>
+              <option value="Third Liner">Third Liner (&lt;Rp1T)</option>
+            </select>
+          </div>
+
+          {/* Market Cap Range */}
+          <div>
+            <label className="block text-sm font-medium text-white/80 mb-3">Market Cap (Trillions Rp)</label>
+            <div className="flex gap-3">
+              <input
+                type="number"
+                placeholder="Min"
+                value={filters.minMarketCap}
+                onChange={(e) => setFilters(prev => ({ ...prev, minMarketCap: e.target.value }))}
+                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+              />
+              <input
+                type="number"
+                placeholder="Max"
+                value={filters.maxMarketCap}
+                onChange={(e) => setFilters(prev => ({ ...prev, maxMarketCap: e.target.value }))}
+                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+              />
+            </div>
+          </div>
+
+          {/* PER Range */}
+          <div>
+            <label className="block text-sm font-medium text-white/80 mb-3">PER Range</label>
+            <div className="flex gap-3">
+              <input
+                type="number"
+                placeholder="Min"
+                value={filters.minPER}
+                onChange={(e) => setFilters(prev => ({ ...prev, minPER: e.target.value }))}
+                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+              />
+              <input
+                type="number"
+                placeholder="Max"
+                value={filters.maxPER}
+                onChange={(e) => setFilters(prev => ({ ...prev, maxPER: e.target.value }))}
+                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+              />
+            </div>
+          </div>
+
+          {/* ROE Range */}
+          <div>
+            <label className="block text-sm font-medium text-white/80 mb-3">ROE Range (%)</label>
+            <div className="flex gap-3">
+              <input
+                type="number"
+                placeholder="Min"
+                value={filters.minROE}
+                onChange={(e) => setFilters(prev => ({ ...prev, minROE: e.target.value }))}
+                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+              />
+              <input
+                type="number"
+                placeholder="Max"
+                value={filters.maxROE}
+                onChange={(e) => setFilters(prev => ({ ...prev, maxROE: e.target.value }))}
+                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+              />
+            </div>
+          </div>
+
+          {/* Clear Filters Button */}
+          <div className="flex items-end">
+            <button
+              onClick={() => setFilters({
+                sector: '',
+                liner: '',
+                minMarketCap: '',
+                maxMarketCap: '',
+                minPER: '',
+                maxPER: '',
+                minROE: '',
+                maxROE: ''
+              })}
+              className="w-full px-6 py-3 bg-red-500/20 hover:bg-red-500/30 border border-red-500/30 rounded-lg text-red-300 hover:text-red-200 transition-all duration-200 font-medium"
+            >
+              Clear Filters
+            </button>
+          </div>
+        </div>
+      </div>
+
       {/* Sector Comparison Tables */}
       {sectorGroups.map((group, groupIndex) => (
         <div key={group.sector} className={`glass-card card-modern overflow-hidden fade-in-up animation-delay-${(groupIndex + 1) * 100}`}>
@@ -310,6 +511,12 @@ export default function SectorComparisonTable() {
                     PBV
                   </th>
                   <th className="px-6 py-4 text-left text-sm font-bold text-white/80 uppercase tracking-wider">
+                    Outstanding Shares
+                  </th>
+                  <th className="px-6 py-4 text-left text-sm font-bold text-white/80 uppercase tracking-wider">
+                    Liner
+                  </th>
+                  <th className="px-6 py-4 text-left text-sm font-bold text-white/80 uppercase tracking-wider">
                     Net Income
                   </th>
                   <th className="px-6 py-4 text-left text-sm font-bold text-white/80 uppercase tracking-wider">
@@ -340,6 +547,12 @@ export default function SectorComparisonTable() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-lg text-white/90 font-medium">
                       {stock.pbv > 0 ? stock.pbv.toFixed(2) : 'N/A'}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-lg text-white/90 font-medium">
+                      {stock.outstandingShares.toLocaleString()}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-lg text-white/90 font-medium">
+                      {getLinerClassification(stock)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-lg text-white/90 font-medium">
                       {formatCurrencyCompact(stock.netProfit)}
