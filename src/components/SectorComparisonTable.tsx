@@ -194,7 +194,7 @@ export default function SectorComparisonTable() {
       .sort((a, b) => b.sectorStats.totalStocks - a.sectorStats.totalStocks); // Sort sectors by stock count
 
     return groups;
-  }, [stockData]);
+  }, [stockData, filters]);
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('id-ID', {
@@ -364,7 +364,7 @@ export default function SectorComparisonTable() {
             <select
               value={filters.sector}
               onChange={(e) => setFilters(prev => ({ ...prev, sector: e.target.value }))}
-              className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+              className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-black placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
             >
               <option value="">All Sectors</option>
               {uniqueSectors.map(sector => (
@@ -379,7 +379,7 @@ export default function SectorComparisonTable() {
             <select
               value={filters.liner}
               onChange={(e) => setFilters(prev => ({ ...prev, liner: e.target.value }))}
-              className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+              className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-black placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
             >
               <option value="">All Liners</option>
               <option value="Blue Chip">Blue Chip (≥Rp10T)</option>
