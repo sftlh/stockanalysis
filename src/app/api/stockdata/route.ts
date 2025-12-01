@@ -1,11 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { getUser } from '@/lib/getUser'
 
 export async function GET() {
   try {
     console.log('GET /api/stockdata - Fetching stock data')
-    const stockData = await prisma.stockData.findMany()
-    console.log(`GET /api/stockdata - Found ${stockData.length} records`)
+    const user = await getUser()
+
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const stockData = await prisma.stockData.findMany({
+      where: {
+        userId: user.id
+      }
+    })
+    console.log(`GET /api/stockdata - Found ${stockData.length} records for user ${user.id}`)
 
     // Convert BigInt to number for JSON serialization
     const serializedData = stockData.map(stock => ({
@@ -23,6 +34,12 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     console.log('POST /api/stockdata - Processing request')
+    const user = await getUser()
+
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
     const body = await request.json()
     console.log('POST /api/stockdata - Received body:', body)
 
@@ -51,7 +68,8 @@ export async function POST(request: NextRequest) {
       dividends: parseFloat(dividends),
       quarter: parseInt(quarter),
       year: parseInt(year),
-      sector: sector || null
+      sector: sector || null,
+      userId: user.id
     })
 
     // Validate outstandingShares
@@ -72,7 +90,8 @@ export async function POST(request: NextRequest) {
         dividends: parseFloat(dividends),
         quarter: parseInt(quarter),
         year: parseInt(year),
-        sector: sector || null // Convert empty string to null for optional field
+        sector: sector || null, // Convert empty string to null for optional field
+        userId: user.id
       }
     })
 

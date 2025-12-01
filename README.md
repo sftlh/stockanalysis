@@ -4,10 +4,11 @@ A comprehensive Next.js application for professional stock analysis and portfoli
 
 ## ✨ Features
 
-### 🔐 User Authentication
+### 🔐 User Authentication & Multi-User Support
 - Secure signup/login with email verification
 - Password reset functionality
 - JWT-based authentication
+- **Multi-User Data Isolation**: Each user can only see and manage their own stock data
 - Protected routes and user sessions
 
 ### 📊 Dashboard Analytics
@@ -28,7 +29,8 @@ A comprehensive Next.js application for professional stock analysis and portfoli
 
 ### 📈 Stock Data Management
 - Add comprehensive stock data (financial metrics, sector, quarter/year)
-- Unique constraints prevent duplicate entries
+- **User-Specific Data**: Each user's stock data is completely isolated
+- Unique constraints prevent duplicate entries per user
 - Real-time data validation and error handling
 - Support for large numerical values (BigInt for outstanding shares)
 
@@ -43,7 +45,7 @@ A comprehensive Next.js application for professional stock analysis and portfoli
 
 - **Frontend**: Next.js 16 (App Router), TypeScript, TailwindCSS, Recharts
 - **Backend**: Next.js API Routes, Prisma ORM
-- **Database**: SQLite (development), PostgreSQL-ready
+- **Database**: PostgreSQL with multi-user data isolation
 - **Authentication**: JWT, bcryptjs, nodemailer
 - **Charts**: Recharts library for data visualization
 - **Email**: SMTP integration for notifications
