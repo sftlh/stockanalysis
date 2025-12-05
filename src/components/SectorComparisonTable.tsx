@@ -50,7 +50,8 @@ export default function SectorComparisonTable() {
     minPER: '',
     maxPER: '',
     minROE: '',
-    maxROE: ''
+    maxROE: '',
+    highlightColor: ''
   });
 
   useEffect(() => {
@@ -74,6 +75,24 @@ export default function SectorComparisonTable() {
     const sectors = new Set(stockData.map(stock => stock.sector));
     return Array.from(sectors).sort();
   }, [stockData]);
+
+  const isGoodStock = (stock: StockData & { per: number; pbv: number; der: number; roe: number; marketCap: number }) => {
+    // Criteria for a "good" stock based on fundamental health metrics
+    const goodROE = stock.roe > 15 // Good profitability
+    const goodDER = stock.der >= 0 && stock.der < 1.0 // Reasonable debt level
+
+    // Consider it good if it meets both key criteria
+    return goodROE && goodDER
+  }
+
+  const isBadStock = (stock: StockData & { per: number; pbv: number; der: number; roe: number; marketCap: number }) => {
+    // Criteria for a "bad" stock based on key risk metrics
+    const badROE = stock.roe < 5 // Poor profitability
+    const badDER = stock.der > 2.0 // High debt risk
+
+    // Consider it bad if it meets at least 1 out of 2 key criteria
+    return badROE || badDER
+  }
 
   const sectorGroups = useMemo(() => {
     // Apply filters first
@@ -128,6 +147,29 @@ export default function SectorComparisonTable() {
         const minROE = filters.minROE ? parseFloat(filters.minROE) : -Infinity;
         const maxROE = filters.maxROE ? parseFloat(filters.maxROE) : Infinity;
         return roe >= minROE && roe <= maxROE;
+      });
+    }
+
+    // Highlight color filter
+    if (filters.highlightColor) {
+      filteredData = filteredData.filter(stock => {
+        const stockWithMetrics = {
+          ...stock,
+          per: stock.eps > 0 ? stock.currentPrice / stock.eps : 0,
+          pbv: stock.totalEquity > 0 ? (stock.currentPrice * stock.outstandingShares) / stock.totalEquity : 0,
+          der: stock.totalEquity > 0 ? stock.totalDebt / stock.totalEquity : 0,
+          roe: stock.totalEquity > 0 ? (stock.netProfit / stock.totalEquity) * 100 : 0,
+          marketCap: stock.currentPrice * stock.outstandingShares
+        };
+
+        if (filters.highlightColor === 'green') {
+          return isGoodStock(stockWithMetrics);
+        } else if (filters.highlightColor === 'red') {
+          return isBadStock(stockWithMetrics);
+        } else if (filters.highlightColor === 'neutral') {
+          return !isGoodStock(stockWithMetrics) && !isBadStock(stockWithMetrics);
+        }
+        return true;
       });
     }
 
@@ -200,24 +242,6 @@ export default function SectorComparisonTable() {
     }).format(value);
   };
 
-  const isGoodStock = (stock: StockData & { per: number; pbv: number; der: number; roe: number; marketCap: number }) => {
-    // Criteria for a "good" stock based on fundamental health metrics
-    const goodROE = stock.roe > 15 // Good profitability
-    const goodDER = stock.der >= 0 && stock.der < 1.0 // Reasonable debt level
-
-    // Consider it good if it meets both key criteria
-    return goodROE && goodDER
-  }
-
-  const isBadStock = (stock: StockData & { per: number; pbv: number; der: number; roe: number; marketCap: number }) => {
-    // Criteria for a "bad" stock based on key risk metrics
-    const badROE = stock.roe < 5 // Poor profitability
-    const badDER = stock.der > 2.0 // High debt risk
-
-    // Consider it bad if it meets at least 1 out of 2 key criteria
-    return badROE || badDER
-  }
-
   const getLinerClassification = (stock: StockData) => {
     const marketCap = stock.currentPrice * stock.outstandingShares
 
@@ -285,7 +309,7 @@ export default function SectorComparisonTable() {
   return (
     <div className="space-y-8">
       {/* Sector Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
         <div className="glass-card card-modern p-8 fade-in-up">
           <div className="flex items-center justify-between mb-6">
             <div>
@@ -323,17 +347,47 @@ export default function SectorComparisonTable() {
         <div className="glass-card card-modern p-8 fade-in-up animation-delay-200">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h3 className="text-xl font-bold text-white mb-2">Avg Sector PER</h3>
-              <p className="text-white/70">Price-to-earnings ratio</p>
+              <h3 className="text-xl font-bold text-white mb-2">Sum of Second Liner</h3>
+              <p className="text-white/70">Mid-cap companies</p>
             </div>
-            <div className="bg-purple-500/20 rounded-xl p-4">
-              <svg className="w-8 h-8 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+            <div className="bg-blue-500/20 rounded-xl p-4">
+              <svg className="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
               </svg>
             </div>
           </div>
           <div className="text-4xl font-bold gradient-text">
-            {sectorGroups.length > 0 ? (sectorGroups.reduce((sum, group) => sum + group.sectorStats.avgPER, 0) / sectorGroups.length).toFixed(1) : '0.0'}
+            {stockData.filter(stock => {
+              const marketCap = stock.currentPrice * stock.outstandingShares;
+              return marketCap >= 1_000_000_000_000 && marketCap < 10_000_000_000_000;
+            }).length}
+          </div>
+        </div>
+
+        <div className="glass-card card-modern p-8 fade-in-up animation-delay-300">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h3 className="text-xl font-bold text-white mb-2">Sum of Bad Emiten</h3>
+              <p className="text-white/70">High risk companies</p>
+            </div>
+            <div className="bg-red-500/20 rounded-xl p-4">
+              <svg className="w-8 h-8 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+              </svg>
+            </div>
+          </div>
+          <div className="text-4xl font-bold gradient-text">
+            {stockData.filter(stock => {
+              const stockWithMetrics = {
+                ...stock,
+                per: stock.eps > 0 ? stock.currentPrice / stock.eps : 0,
+                pbv: stock.totalEquity > 0 ? (stock.currentPrice * stock.outstandingShares) / stock.totalEquity : 0,
+                der: stock.totalEquity > 0 ? stock.totalDebt / stock.totalEquity : 0,
+                roe: stock.totalEquity > 0 ? (stock.netProfit / stock.totalEquity) * 100 : 0,
+                marketCap: stock.currentPrice * stock.outstandingShares
+              };
+              return isBadStock(stockWithMetrics);
+            }).length}
           </div>
         </div>
       </div>
@@ -341,7 +395,7 @@ export default function SectorComparisonTable() {
       {/* Filters Section */}
       <div className="glass-card card-modern p-8 fade-in-up animation-delay-300">
         <h3 className="text-xl font-bold text-white mb-6">Filters</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {/* Sector Filter */}
           <div>
             <label className="block text-sm font-medium text-white/80 mb-3">Sector</label>
@@ -435,6 +489,21 @@ export default function SectorComparisonTable() {
             </div>
           </div>
 
+          {/* Highlight Color Filter */}
+          <div>
+            <label className="block text-sm font-medium text-white/80 mb-3">Highlight Color</label>
+            <select
+              value={filters.highlightColor}
+              onChange={(e) => setFilters(prev => ({ ...prev, highlightColor: e.target.value }))}
+              className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-black placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+            >
+              <option value="">All Stocks</option>
+              <option value="green">Green (Good Stocks)</option>
+              <option value="red">Red (Bad Stocks)</option>
+              <option value="neutral">Neutral (Normal Stocks)</option>
+            </select>
+          </div>
+
           {/* Clear Filters Button */}
           <div className="flex items-end">
             <button
@@ -446,7 +515,8 @@ export default function SectorComparisonTable() {
                 minPER: '',
                 maxPER: '',
                 minROE: '',
-                maxROE: ''
+                maxROE: '',
+                highlightColor: ''
               })}
               className="w-full px-6 py-3 bg-red-500/20 hover:bg-red-500/30 border border-red-500/30 rounded-lg text-red-300 hover:text-red-200 transition-all duration-200 font-medium"
             >
