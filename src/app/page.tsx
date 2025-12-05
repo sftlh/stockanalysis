@@ -208,27 +208,6 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="glass-card card-modern p-8 fade-in-up animation-delay-100">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-white/60 uppercase tracking-wide">High NPL Emiten</p>
-                <div className="text-4xl font-bold text-white mt-2">
-                  {stocksLoading ? (
-                    <div className="animate-pulse bg-white/20 h-10 w-16 rounded"></div>
-                  ) : (
-                    filteredStocks.filter(stock => stock.totalDebt !== 0 && (stock.netProfit / stock.totalDebt) * 100 > 20).length
-                  )}
-                </div>
-                <p className="text-xs text-green-400 mt-2 font-medium">NPL {'>'} 20%</p>
-              </div>
-              <div className="bg-green-500/20 rounded-xl p-4">
-                <svg className="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-            </div>
-          </div>
-
           <div className="glass-card card-modern p-8 fade-in-up animation-delay-200">
             <div className="flex items-center justify-between">
               <div>
@@ -266,6 +245,27 @@ export default function Home() {
               <div className="bg-green-500/20 rounded-xl p-4">
                 <svg className="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div className="glass-card card-modern p-8 fade-in-up animation-delay-400">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-white/60 uppercase tracking-wide">Low DER Emiten</p>
+                <div className="text-4xl font-bold text-white mt-2">
+                  {stocksLoading ? (
+                    <div className="animate-pulse bg-white/20 h-10 w-16 rounded"></div>
+                  ) : (
+                    filteredStocks.filter(stock => stock.totalEquity !== 0 && (stock.totalDebt / stock.totalEquity) < 0.5).length
+                  )}
+                </div>
+                <p className="text-xs text-blue-400 mt-2 font-medium">DER {'<'} 0.5</p>
+              </div>
+              <div className="bg-blue-500/20 rounded-xl p-4">
+                <svg className="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
             </div>

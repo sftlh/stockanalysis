@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, BarChart, Bar } from 'recharts'
-import { formatCurrency, formatCurrencyCompact } from '@/lib/currency'
+import { formatCurrencyCompact } from '@/lib/currency'
 
 interface StockData {
   id: number
@@ -116,6 +116,66 @@ export default function StockCharts({ stocks }: StockChartsProps) {
     })
 
     return growthData
+  }, [stocks])
+
+  const yearlyGrowthData = useMemo(() => {
+    if (stocks.length === 0) return []
+
+    // Group stocks by issuer and year
+    const issuerYearlyGroups: { [key: string]: { [key: number]: StockData[] } } = {}
+    stocks.forEach((stock) => {
+      if (!issuerYearlyGroups[stock.issuerName]) {
+        issuerYearlyGroups[stock.issuerName] = {}
+      }
+      if (!issuerYearlyGroups[stock.issuerName][stock.year]) {
+        issuerYearlyGroups[stock.issuerName][stock.year] = []
+      }
+      issuerYearlyGroups[stock.issuerName][stock.year].push(stock)
+    })
+
+    // Create yearly periods
+    const allYears = new Set<number>()
+    Object.values(issuerYearlyGroups).forEach(yearlyData => {
+      Object.keys(yearlyData).forEach(year => {
+        allYears.add(parseInt(year))
+      })
+    })
+
+    const sortedYears = Array.from(allYears).sort()
+
+    // Create data points for each year, with yearly growth for each issuer
+    const yearlyGrowthData: { period: string; [key: string]: string | number }[] = []
+
+    sortedYears.forEach(year => {
+      const dataPoint: { period: string; [key: string]: string | number } = { period: year.toString() }
+
+      Object.entries(issuerYearlyGroups).forEach(([issuer, yearlyStocks]) => {
+        const stocksForYear = yearlyStocks[year]
+        if (stocksForYear && stocksForYear.length > 0) {
+          // Sum net profit for the year (assuming quarterly data)
+          const yearlyNetProfit = stocksForYear.reduce((sum, stock) => sum + stock.netProfit, 0)
+
+          // Find previous year data
+          const prevYear = year - 1
+          const prevYearStocks = yearlyStocks[prevYear]
+          let growth = 0
+
+          if (prevYearStocks && prevYearStocks.length > 0) {
+            const prevYearlyNetProfit = prevYearStocks.reduce((sum, stock) => sum + stock.netProfit, 0)
+            if (prevYearlyNetProfit !== 0) {
+              growth = ((yearlyNetProfit - prevYearlyNetProfit) / Math.abs(prevYearlyNetProfit)) * 100
+            }
+          }
+
+          dataPoint[`${issuer}_growth`] = parseFloat(growth.toFixed(2))
+          dataPoint[`${issuer}_netProfit`] = yearlyNetProfit
+        }
+      })
+
+      yearlyGrowthData.push(dataPoint)
+    })
+
+    return yearlyGrowthData
   }, [stocks])
 
   // Get unique issuers for chart lines (limited to 10 for cleaner display)
@@ -399,16 +459,16 @@ export default function StockCharts({ stocks }: StockChartsProps) {
           </div>
         </div>
 
-        {/* Laba Bersih Growth */}
+        {/* Net Profit Growth */}
         <div className="glass-card card-modern p-8 fade-in-up animation-delay-600">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-2xl font-bold text-white">Laba Bersih Growth</h3>
+            <h3 className="text-2xl font-bold text-white">Net Profit Growth</h3>
             <div className="flex items-center gap-4 bg-white/10 rounded-xl p-2">
               <span className={`text-sm font-medium transition-colors ${!showGrowth ? 'text-white' : 'text-white/60'}`}>Quarterly Growth</span>
               <button
                 onClick={() => setShowGrowth(!showGrowth)}
                 className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-white/50 ${
-                  showGrowth ? 'bg-gradient-to-r from-blue-500 to-purple-500' : 'bg-white/20'
+                  showGrowth ? 'bg-linear-to-r from-blue-500 to-purple-500' : 'bg-white/20'
                 }`}
               >
                 <span
@@ -417,21 +477,19 @@ export default function StockCharts({ stocks }: StockChartsProps) {
                   }`}
                 />
               </button>
-              <span className={`text-sm font-medium transition-colors ${showGrowth ? 'text-white' : 'text-white/60'}`}>Absolute Value</span>
+              <span className={`text-sm font-medium transition-colors ${showGrowth ? 'text-white' : 'text-white/60'}`}>Yearly Growth</span>
             </div>
           </div>
           <div className="h-80">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={showGrowth ? netProfitGrowthData : chartData}>
+              <LineChart data={showGrowth ? yearlyGrowthData : netProfitGrowthData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
                 <XAxis dataKey="period" stroke="#9CA3AF" />
                 <YAxis stroke="#9CA3AF" />
                 <Tooltip
                   formatter={(value: number, name: string) => [
-                    showGrowth
-                      ? `${value.toFixed(2)}%`
-                      : formatCurrency(value),
-                    showGrowth ? `${name} Growth (%)` : 'Net Profit'
+                    `${value.toFixed(2)}%`,
+                    showGrowth ? `${name} Yearly Growth (%)` : `${name} Quarterly Growth (%)`
                   ]}
                   contentStyle={{
                     backgroundColor: '#1F2937',
@@ -441,31 +499,19 @@ export default function StockCharts({ stocks }: StockChartsProps) {
                   }}
                 />
                 <Legend />
-                {showGrowth ? (
-                  // Show separate lines for each issuer's growth
-                  uniqueIssuers.map((issuer, index) => (
-                    <Line
-                      key={issuer}
-                      type="monotone"
-                      dataKey={`${issuer}_growth`}
-                      stroke={COLORS[index % COLORS.length]}
-                      strokeWidth={2}
-                      dot={{ fill: COLORS[index % COLORS.length], strokeWidth: 2, r: 4 }}
-                      name={`${issuer} Growth (%)`}
-                      connectNulls={false}
-                    />
-                  ))
-                ) : (
-                  // Show single line for absolute values
+                {/* Show separate lines for each issuer's growth */}
+                {uniqueIssuers.map((issuer, index) => (
                   <Line
+                    key={issuer}
                     type="monotone"
-                    dataKey="netProfit"
-                    stroke="#7C3AED"
+                    dataKey={`${issuer}_growth`}
+                    stroke={COLORS[index % COLORS.length]}
                     strokeWidth={2}
-                    dot={{ fill: '#7C3AED', strokeWidth: 2, r: 4 }}
-                    name="Net Profit"
+                    dot={{ fill: COLORS[index % COLORS.length], strokeWidth: 2, r: 4 }}
+                    name={`${issuer} ${showGrowth ? 'Yearly' : 'Quarterly'} Growth (%)`}
+                    connectNulls={false}
                   />
-                )}
+                ))}
               </LineChart>
             </ResponsiveContainer>
           </div>

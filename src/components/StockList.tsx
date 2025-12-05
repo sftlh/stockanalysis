@@ -104,7 +104,6 @@ export default function StockList({ stocks: propStocks }: StockListProps) {
                   <th className="px-6 py-4 text-left text-sm font-bold text-white/80 uppercase tracking-wider">PBV</th>
                   <th className="px-6 py-4 text-left text-sm font-bold text-white/80 uppercase tracking-wider">ROE</th>
                   <th className="px-6 py-4 text-left text-sm font-bold text-white/80 uppercase tracking-wider">DER</th>
-                  <th className="px-6 py-4 text-left text-sm font-bold text-white/80 uppercase tracking-wider">NPL</th>
                   <th className="px-6 py-4 text-left text-sm font-bold text-white/80 uppercase tracking-wider">Quarter</th>
                   <th className="px-6 py-4 text-left text-sm font-bold text-white/80 uppercase tracking-wider">Year</th>
                 </tr>
@@ -116,7 +115,6 @@ export default function StockList({ stocks: propStocks }: StockListProps) {
                   const pbv = bookValue !== 'N/A' && parseFloat(bookValue) !== 0 ? (stock.currentPrice / parseFloat(bookValue)).toFixed(2) : 'N/A'
                   const roe = stock.totalEquity !== 0 ? ((stock.netProfit / stock.totalEquity) * 100).toFixed(2) + '%' : 'N/A'
                   const der = stock.totalEquity !== 0 ? ((stock.totalDebt / stock.totalEquity) * 100).toFixed(2) + '%' : 'N/A'
-                  const npl = stock.totalDebt !== 0 ? ((stock.netProfit / stock.totalDebt) * 100).toFixed(2) + '%' : 'N/A'
 
                   return (
                     <tr key={stock.id} className="hover:bg-white/5 transition-colors duration-200">
@@ -130,7 +128,6 @@ export default function StockList({ stocks: propStocks }: StockListProps) {
                       <td className="px-6 py-4 whitespace-nowrap text-lg text-white/90 font-medium">{pbv}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-lg text-white/90 font-medium">{roe}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-lg text-white/90 font-medium">{der}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-lg text-white/90 font-medium">{npl}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-lg text-white/90 font-medium">Q{stock.quarter}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-lg text-white/90 font-medium">{stock.year}</td>
                     </tr>
