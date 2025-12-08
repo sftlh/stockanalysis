@@ -55,7 +55,8 @@ export default function StockList({ stocks: propStocks }: StockListProps) {
 
   const totalPages = Math.ceil(stocks.length / itemsPerPage)
   const startIndex = (currentPage - 1) * itemsPerPage
-  const paginatedStocks = stocks.slice(startIndex, startIndex + itemsPerPage)
+  const sortedStocks = stocks.sort((a, b) => b.id - a.id) // Sort by latest first (descending ID)
+  const paginatedStocks = sortedStocks.slice(startIndex, startIndex + itemsPerPage)
 
   if (loading) {
     return (
