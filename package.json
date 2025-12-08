@@ -15,7 +15,7 @@
     "@types/nodemailer": "^7.0.4",
     "bcryptjs": "^3.0.3",
     "jsonwebtoken": "^9.0.2",
-    "next": "16.0.3",
+    "next": "16.0.8",
     "nodemailer": "^7.0.10",
     "prisma": "^5.22.0",
     "react": "19.2.0",
