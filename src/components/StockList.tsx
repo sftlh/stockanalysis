@@ -75,8 +75,32 @@ export default function StockList({ stocks: propStocks }: StockListProps) {
   return (
     <div className="glass-card card-modern overflow-hidden">
       <div className="px-8 py-6 border-b border-white/10 bg-white/5">
-        <h3 className="text-3xl font-bold text-white mb-2">Stock Analysis Results</h3>
-        <p className="text-white/70 text-lg">Comprehensive financial analysis and key metrics</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-3xl font-bold text-white mb-2">Stock Analysis Results</h3>
+            <p className="text-white/70 text-lg">Comprehensive financial analysis and key metrics</p>
+          </div>
+          {stocks.length > 0 && (
+            <div className="glass-card card-modern p-4 bg-linear-to-r from-blue-500/20 to-purple-500/20 border border-white/20">
+              <div className="flex items-center gap-3">
+                <div className="bg-blue-500/30 rounded-lg p-2">
+                  <svg className="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <div>
+                  <p className="text-xs font-medium text-white/60 uppercase tracking-wide">Latest Emiten</p>
+                  <p className="text-lg font-bold text-white">
+                    {stocks.sort((a, b) => b.id - a.id)[0]?.issuerName}
+                  </p>
+                  <p className="text-xs text-white/50">
+                    Q{stocks.sort((a, b) => b.id - a.id)[0]?.quarter} {stocks.sort((a, b) => b.id - a.id)[0]?.year}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
       {stocks.length === 0 ? (
         <div className="p-12 text-center">
@@ -151,6 +175,13 @@ export default function StockList({ stocks: propStocks }: StockListProps) {
                 >
                   Previous
                 </button>
+                <button
+                  onClick={() => setCurrentPage(1)}
+                  disabled={currentPage === 1}
+                  className="btn-outline px-4 py-3 text-sm font-semibold rounded-xl transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                >
+                  First
+                </button>
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-white/70 font-medium">Page</span>
                   <span className="text-lg font-bold text-white bg-white/10 rounded-lg px-3 py-1">
@@ -158,6 +189,13 @@ export default function StockList({ stocks: propStocks }: StockListProps) {
                   </span>
                   <span className="text-sm text-white/70 font-medium">of {totalPages}</span>
                 </div>
+                <button
+                  onClick={() => setCurrentPage(totalPages)}
+                  disabled={currentPage === totalPages}
+                  className="btn-outline px-4 py-3 text-sm font-semibold rounded-xl transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                >
+                  Latest
+                </button>
                 <button
                   onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
                   disabled={currentPage === totalPages}
