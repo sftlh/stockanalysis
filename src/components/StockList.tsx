@@ -17,6 +17,7 @@ interface StockData {
   quarter: number
   year: number
   sector?: string
+  bookmarked?: boolean
 }
 
 interface StockListProps {
@@ -57,6 +58,34 @@ export default function StockList({ stocks: propStocks }: StockListProps) {
   const startIndex = (currentPage - 1) * itemsPerPage
   const sortedStocks = stocks.sort((a, b) => b.id - a.id) // Sort by latest first (descending ID)
   const paginatedStocks = sortedStocks.slice(startIndex, startIndex + itemsPerPage)
+
+  const toggleBookmark = async (stockId: number) => {
+    try {
+      const response = await fetch(`/api/stockdata/${stockId}/bookmark`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+
+      if (response.ok) {
+        const result = await response.json()
+        // Update local state for all stocks with the same issuer name
+        const targetStock = stocks.find(s => s.id === stockId)
+        if (targetStock) {
+          setStocks(prevStocks =>
+            prevStocks.map(stock =>
+              stock.issuerName === targetStock.issuerName
+                ? { ...stock, bookmarked: result.bookmarked }
+                : stock
+            )
+          )
+        }
+      }
+    } catch (error) {
+      console.error('Failed to toggle bookmark:', error)
+    }
+  }
 
   if (loading) {
     return (
@@ -131,6 +160,7 @@ export default function StockList({ stocks: propStocks }: StockListProps) {
                   <th className="px-6 py-4 text-left text-sm font-bold text-white/80 uppercase tracking-wider">DER</th>
                   <th className="px-6 py-4 text-left text-sm font-bold text-white/80 uppercase tracking-wider">Quarter</th>
                   <th className="px-6 py-4 text-left text-sm font-bold text-white/80 uppercase tracking-wider">Year</th>
+                  <th className="px-6 py-4 text-left text-sm font-bold text-white/80 uppercase tracking-wider">Bookmark</th>
                 </tr>
               </thead>
               <tbody className="bg-transparent divide-y divide-white/5">
@@ -155,6 +185,21 @@ export default function StockList({ stocks: propStocks }: StockListProps) {
                       <td className="px-6 py-4 whitespace-nowrap text-lg text-white/90 font-medium">{der}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-lg text-white/90 font-medium">Q{stock.quarter}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-lg text-white/90 font-medium">{stock.year}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-center">
+                        <button
+                          onClick={() => toggleBookmark(stock.id)}
+                          className={`p-2 rounded-lg transition-all duration-200 hover:scale-110 ${
+                            stock.bookmarked
+                              ? 'text-yellow-400 hover:text-yellow-300 bg-yellow-500/20 hover:bg-yellow-500/30'
+                              : 'text-white/60 hover:text-yellow-400 bg-white/10 hover:bg-yellow-500/20'
+                          }`}
+                          title={stock.bookmarked ? 'Remove from bookmarks' : 'Add to bookmarks'}
+                        >
+                          <svg className="w-5 h-5" fill={stock.bookmarked ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                          </svg>
+                        </button>
+                      </td>
                     </tr>
                   )
                 })}

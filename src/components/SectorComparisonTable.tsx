@@ -16,6 +16,7 @@ interface StockData {
   dividends: number;
   quarter: number;
   year: number;
+  bookmarked?: boolean;
 }
 
 interface SectorGroup {
@@ -264,6 +265,34 @@ export default function SectorComparisonTable() {
     }
     return formatCurrency(value);
   };
+
+  const toggleBookmark = async (stockId: number) => {
+    try {
+      const response = await fetch(`/api/stockdata/${stockId}/bookmark`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+
+      if (response.ok) {
+        const result = await response.json()
+        // Update local state for all stocks with the same issuer name
+        const targetStock = stockData.find(s => s.id === stockId)
+        if (targetStock) {
+          setStockData(prevStocks =>
+            prevStocks.map(stock =>
+              stock.issuerName === targetStock.issuerName
+                ? { ...stock, bookmarked: result.bookmarked }
+                : stock
+            )
+          )
+        }
+      }
+    } catch (error) {
+      console.error('Failed to toggle bookmark:', error)
+    }
+  }
 
   if (loading) {
     return (
@@ -559,6 +588,9 @@ export default function SectorComparisonTable() {
                     Last Year
                   </th>
                   <th className="px-6 py-4 text-left text-sm font-bold text-white/80 uppercase tracking-wider">
+                    Price
+                  </th>
+                  <th className="px-6 py-4 text-left text-sm font-bold text-white/80 uppercase tracking-wider">
                     PER
                   </th>
                   <th className="px-6 py-4 text-left text-sm font-bold text-white/80 uppercase tracking-wider">
@@ -578,6 +610,9 @@ export default function SectorComparisonTable() {
                   </th>
                   <th className="px-6 py-4 text-left text-sm font-bold text-white/80 uppercase tracking-wider">
                     ROE
+                  </th>
+                  <th className="px-6 py-4 text-left text-sm font-bold text-white/80 uppercase tracking-wider">
+                    Bookmark
                   </th>
                 </tr>
               </thead>
@@ -600,6 +635,9 @@ export default function SectorComparisonTable() {
                       {stock.year}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-lg text-white/90 font-medium">
+                      {formatCurrency(stock.currentPrice)}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-lg text-white/90 font-medium">
                       {stock.per > 0 ? stock.per.toFixed(2) : 'N/A'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-lg text-white/90 font-medium">
@@ -619,6 +657,21 @@ export default function SectorComparisonTable() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-lg text-white/90 font-medium">
                       {!isNaN(stock.roe) ? `${stock.roe.toFixed(1)}%` : 'N/A'}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-center">
+                      <button
+                        onClick={() => toggleBookmark(stock.id)}
+                        className={`p-2 rounded-lg transition-all duration-200 hover:scale-110 ${
+                          stock.bookmarked
+                            ? 'text-yellow-400 hover:text-yellow-300 bg-yellow-500/20 hover:bg-yellow-500/30'
+                            : 'text-white/60 hover:text-yellow-400 bg-white/10 hover:bg-yellow-500/20'
+                        }`}
+                        title={stock.bookmarked ? 'Remove from bookmarks' : 'Add to bookmarks'}
+                      >
+                        <svg className="w-5 h-5" fill={stock.bookmarked ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                        </svg>
+                      </button>
                     </td>
                   </tr>
                 ))}

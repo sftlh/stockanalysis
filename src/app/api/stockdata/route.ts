@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { getUser } from '@/lib/getUser'
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     console.log('GET /api/stockdata - Fetching stock data')
     const user = await getUser()
@@ -11,10 +11,19 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    const { searchParams } = new URL(request.url)
+    const bookmarked = searchParams.get('bookmarked')
+
+    const whereClause: any = {
+      userId: user.id
+    }
+
+    if (bookmarked === 'true') {
+      whereClause.bookmarked = true
+    }
+
     const stockData = await prisma.stockData.findMany({
-      where: {
-        userId: user.id
-      }
+      where: whereClause
     })
     console.log(`GET /api/stockdata - Found ${stockData.length} records for user ${user.id}`)
 
