@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -14,7 +15,8 @@ import {
   Tooltip,
   ResponsiveContainer,
   Area,
-  AreaChart
+  AreaChart,
+  ComposedChart
 } from 'recharts';
 
 interface StockData {
@@ -43,6 +45,8 @@ export default function IssuerDetailsPage() {
   const [error, setError] = useState<string | null>(null);
   const [notes, setNotes] = useState<string>('');
   const [isEditingNotes, setIsEditingNotes] = useState(false);
+  const [selectedYears, setSelectedYears] = useState<number[]>([]);
+  const [comparisonMode, setComparisonMode] = useState(false);
 
   useEffect(() => {
     const fetchIssuerStocks = async () => {
@@ -83,8 +87,14 @@ export default function IssuerDetailsPage() {
     }
   }, [issuerName]);
 
-  // Prepare chart data
-  const chartData = stocks
+  // Prepare quarterly comparison data
+  const currentYear = new Date().getFullYear();
+  const availableYears = Array.from(new Set(stocks.map(stock => stock.year)))
+    .filter(year => year >= currentYear - 5)
+    .sort((a, b) => b - a);
+
+  // Prepare chart data for performance charts
+  const performanceChartData = stocks
     .sort((a, b) => {
       if (a.year !== b.year) return a.year - b.year;
       return a.quarter - b.quarter;
@@ -107,6 +117,76 @@ export default function IssuerDetailsPage() {
         year: stock.year
       };
     });
+
+  const quarterlyComparisonData = availableYears.map(year => {
+    const yearStocks = stocks.filter(stock => stock.year === year);
+    const quarters = [1, 2, 3, 4].map(quarter => {
+      const quarterStock = yearStocks.find(stock => stock.quarter === quarter);
+      if (quarterStock) {
+        const per = quarterStock.eps !== 0 ? quarterStock.currentPrice / quarterStock.eps : null;
+        const roe = quarterStock.totalEquity !== 0 ? (quarterStock.netProfit / quarterStock.totalEquity) * 100 : null;
+        const bookValue = quarterStock.outstandingShares !== 0 ? quarterStock.totalEquity / quarterStock.outstandingShares : null;
+        const pbv = bookValue && bookValue !== 0 ? quarterStock.currentPrice / bookValue : null;
+
+        return {
+          quarter: `Q${quarter}`,
+          price: quarterStock.currentPrice,
+          eps: quarterStock.eps,
+          netProfit: quarterStock.netProfit,
+          per: per || 0,
+          roe: roe || 0,
+          pbv: pbv || 0,
+          outstandingShares: quarterStock.outstandingShares,
+          hasData: true
+        };
+      }
+      return {
+        quarter: `Q${quarter}`,
+        price: 0,
+        eps: 0,
+        netProfit: 0,
+        per: 0,
+        roe: 0,
+        pbv: 0,
+        outstandingShares: 0,
+        hasData: false
+      };
+    });
+
+    return {
+      year,
+      quarters,
+      avgPrice: quarters.filter(q => q.hasData).reduce((sum, q) => sum + q.price, 0) / quarters.filter(q => q.hasData).length || 0,
+      avgEPS: quarters.filter(q => q.hasData).reduce((sum, q) => sum + q.eps, 0) / quarters.filter(q => q.hasData).length || 0,
+      avgNetProfit: quarters.filter(q => q.hasData).reduce((sum, q) => sum + q.netProfit, 0) / quarters.filter(q => q.hasData).length || 0,
+      avgROE: quarters.filter(q => q.hasData).reduce((sum, q) => sum + q.roe, 0) / quarters.filter(q => q.hasData).length || 0,
+      avgOutstandingShares: quarters.filter(q => q.hasData).reduce((sum, q) => sum + q.outstandingShares, 0) / quarters.filter(q => q.hasData).length || 0
+    };
+  });
+
+  const toggleYearSelection = (year: number) => {
+    setSelectedYears(prev =>
+      prev.includes(year)
+        ? prev.filter(y => y !== year)
+        : prev.length < 3 ? [...prev, year] : prev
+    );
+  };
+
+  const comparisonChartData = selectedYears.length > 0
+    ? [1, 2, 3, 4].map(quarter => {
+        const dataPoint: any = { period: `Q${quarter}` };
+        selectedYears.forEach(year => {
+          const yearData = quarterlyComparisonData.find(y => y.year === year);
+          const quarterData = yearData?.quarters.find(q => q.quarter === `Q${quarter}`);
+          dataPoint[`price${year}`] = quarterData?.hasData ? quarterData.price : 0;
+          dataPoint[`eps${year}`] = quarterData?.hasData ? quarterData.eps : 0;
+          dataPoint[`netProfit${year}`] = quarterData?.hasData ? quarterData.netProfit : 0;
+          dataPoint[`roe${year}`] = quarterData?.hasData ? quarterData.roe : 0;
+          dataPoint[`outstandingShares${year}`] = quarterData?.hasData ? (quarterData.outstandingShares || 0) : 0;
+        });
+        return dataPoint;
+      })
+    : [];
 
   // Calculate growth rates and analysis
   const calculateGrowthRate = (current: number, previous: number) => {
@@ -251,7 +331,7 @@ export default function IssuerDetailsPage() {
                 <div>
                   <h3 className="text-lg font-semibold text-white mb-4">Stock Price Trend</h3>
                   <ResponsiveContainer width="100%" height={300}>
-                    <AreaChart data={chartData}>
+                    <AreaChart data={performanceChartData}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
                       <XAxis dataKey="period" stroke="#9CA3AF" />
                       <YAxis stroke="#9CA3AF" />
@@ -285,7 +365,7 @@ export default function IssuerDetailsPage() {
                 <div>
                   <h3 className="text-lg font-semibold text-white mb-4">EPS Trend</h3>
                   <ResponsiveContainer width="100%" height={300}>
-                    <LineChart data={chartData}>
+                    <LineChart data={performanceChartData}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
                       <XAxis dataKey="period" stroke="#9CA3AF" />
                       <YAxis stroke="#9CA3AF" />
@@ -313,7 +393,7 @@ export default function IssuerDetailsPage() {
                 <div>
                   <h3 className="text-lg font-semibold text-white mb-4">Net Profit Trend</h3>
                   <ResponsiveContainer width="100%" height={300}>
-                    <BarChart data={chartData}>
+                    <BarChart data={performanceChartData}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
                       <XAxis dataKey="period" stroke="#9CA3AF" />
                       <YAxis stroke="#9CA3AF" />
@@ -335,7 +415,7 @@ export default function IssuerDetailsPage() {
                 <div>
                   <h3 className="text-lg font-semibold text-white mb-4">ROE Trend (%)</h3>
                   <ResponsiveContainer width="100%" height={300}>
-                    <LineChart data={chartData}>
+                    <LineChart data={performanceChartData}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
                       <XAxis dataKey="period" stroke="#9CA3AF" />
                       <YAxis stroke="#9CA3AF" />
@@ -569,6 +649,332 @@ export default function IssuerDetailsPage() {
                   >
                     {notes ? 'Edit Notes' : 'Add Notes'}
                   </button>
+                </div>
+              )}
+            </div>
+
+            {/* Quarterly Comparison */}
+            <div className="glass-card card-modern p-8">
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h2 className="text-2xl font-bold text-white">Quarterly Comparison</h2>
+                  <p className="text-white/70">Compare performance across quarters and years</p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => setComparisonMode(!comparisonMode)}
+                    className={`px-4 py-2 rounded-xl font-medium transition-all duration-300 ${
+                      comparisonMode
+                        ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
+                        : 'bg-white/10 text-white/70 hover:bg-white/20'
+                    }`}
+                  >
+                    {comparisonMode ? 'Hide Charts' : 'Compare Years'}
+                  </button>
+                  <div className="bg-orange-500/20 rounded-xl px-4 py-2">
+                    <span className="text-sm text-orange-300 font-medium">Analysis Tool</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Year Selection */}
+              <div className="mb-6">
+                <h3 className="text-lg font-semibold text-white mb-4">Select Years to Compare (Max 3)</h3>
+                <div className="flex flex-wrap gap-3">
+                  {availableYears.map(year => (
+                    <button
+                      key={year}
+                      onClick={() => toggleYearSelection(year)}
+                      className={`px-4 py-2 rounded-xl font-medium transition-all duration-300 ${
+                        selectedYears.includes(year)
+                          ? 'bg-blue-500 text-white shadow-lg'
+                          : 'bg-white/10 text-white/70 hover:bg-white/20'
+                      } ${selectedYears.length >= 3 && !selectedYears.includes(year) ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      disabled={selectedYears.length >= 3 && !selectedYears.includes(year)}
+                    >
+                      {year}
+                    </button>
+                  ))}
+                </div>
+                {selectedYears.length === 0 && (
+                  <p className="text-white/60 text-sm mt-2">Select up to 3 years to compare quarterly performance</p>
+                )}
+              </div>
+
+              {/* Quarterly Overview Table */}
+              <div className="mb-8 overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-white/10">
+                      <th className="text-left py-3 px-4 text-white/80 font-semibold">Year</th>
+                      <th className="text-center py-3 px-4 text-white/80 font-semibold">Q1</th>
+                      <th className="text-center py-3 px-4 text-white/80 font-semibold">Q2</th>
+                      <th className="text-center py-3 px-4 text-white/80 font-semibold">Q3</th>
+                      <th className="text-center py-3 px-4 text-white/80 font-semibold">Q4</th>
+                      <th className="text-center py-3 px-4 text-white/80 font-semibold">Avg Price</th>
+                      <th className="text-center py-3 px-4 text-white/80 font-semibold">Avg EPS</th>
+                      <th className="text-center py-3 px-4 text-white/80 font-semibold">Avg ROE</th>
+                      <th className="text-center py-3 px-4 text-white/80 font-semibold">Avg Shares</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {quarterlyComparisonData.map(yearData => (
+                      <tr key={yearData.year} className="border-b border-white/5 hover:bg-white/5">
+                        <td className="py-3 px-4 text-white font-semibold">{yearData.year}</td>
+                        {yearData.quarters.map(quarter => (
+                          <td key={quarter.quarter} className="py-3 px-4 text-center">
+                            {quarter.hasData ? (
+                              <div className="text-white/90">
+                                <div className="font-semibold">{formatCurrency(quarter.price)}</div>
+                                <div className="text-xs text-white/60">{formatCurrency(quarter.eps)} EPS</div>
+                              </div>
+                            ) : (
+                              <span className="text-white/40 text-sm">-</span>
+                            )}
+                          </td>
+                        ))}
+                        <td className="py-3 px-4 text-center text-white font-semibold">
+                          {formatCurrency(yearData.avgPrice)}
+                        </td>
+                        <td className="py-3 px-4 text-center text-white font-semibold">
+                          {formatCurrency(yearData.avgEPS)}
+                        </td>
+                        <td className="py-3 px-4 text-center text-white font-semibold">
+                          {yearData.avgROE.toFixed(1)}%
+                        </td>
+                        <td className="py-3 px-4 text-center text-white font-semibold">
+                          {yearData.avgOutstandingShares.toLocaleString()}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Comparison Charts */}
+              {comparisonMode && selectedYears.length > 0 && (
+                <div className="space-y-8">
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    {/* Price Comparison */}
+                    <div>
+                      <h3 className="text-lg font-semibold text-white mb-4">Stock Price Comparison</h3>
+                      <ResponsiveContainer width="100%" height={300}>
+                        <LineChart data={comparisonChartData}>
+                          <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                          <XAxis dataKey="period" stroke="#9CA3AF" angle={-45} textAnchor="end" height={80} />
+                          <YAxis stroke="#9CA3AF" />
+                          <Tooltip
+                            contentStyle={{
+                              backgroundColor: '#1F2937',
+                              border: '1px solid #374151',
+                              borderRadius: '8px',
+                              color: '#F9FAFB'
+                            }}
+                            formatter={(value: number, name: string, props: any) => [
+                              formatCurrency(value),
+                              `${props.payload.year} Price`
+                            ]}
+                          />
+                          {selectedYears.map((year, index) => (
+                            <Line
+                              key={year}
+                              type="monotone"
+                              dataKey={`price${year}`}
+                              stroke={`hsl(${index * 120}, 70%, 50%)`}
+                              strokeWidth={3}
+                              dot={{ fill: `hsl(${index * 120}, 70%, 50%)`, strokeWidth: 2, r: 4 }}
+                              name={`${year} Price`}
+                            />
+                          ))}
+                        </LineChart>
+                      </ResponsiveContainer>
+                    </div>
+
+                    {/* EPS Comparison */}
+                    <div>
+                      <h3 className="text-lg font-semibold text-white mb-4">EPS Comparison</h3>
+                      <ResponsiveContainer width="100%" height={300}>
+                        <BarChart data={comparisonChartData}>
+                          <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                          <XAxis dataKey="period" stroke="#9CA3AF" angle={-45} textAnchor="end" height={80} />
+                          <YAxis stroke="#9CA3AF" />
+                          <Tooltip
+                            contentStyle={{
+                              backgroundColor: '#1F2937',
+                              border: '1px solid #374151',
+                              borderRadius: '8px',
+                              color: '#F9FAFB'
+                            }}
+                            formatter={(value: number, name: string, props: any) => [
+                              formatCurrency(value),
+                              `${props.payload.year} EPS`
+                            ]}
+                          />
+                          {selectedYears.map((year, index) => (
+                            <Bar
+                              key={year}
+                              dataKey={`eps${year}`}
+                              fill={`hsl(${index * 120}, 70%, 50%)`}
+                              name={`${year} EPS`}
+                            />
+                          ))}
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
+
+                    {/* Net Profit Comparison */}
+                    <div>
+                      <h3 className="text-lg font-semibold text-white mb-4">Net Profit Comparison</h3>
+                      <ResponsiveContainer width="100%" height={300}>
+                        <AreaChart data={comparisonChartData}>
+                          <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                          <XAxis dataKey="period" stroke="#9CA3AF" angle={-45} textAnchor="end" height={80} />
+                          <YAxis stroke="#9CA3AF" />
+                          <Tooltip
+                            contentStyle={{
+                              backgroundColor: '#1F2937',
+                              border: '1px solid #374151',
+                              borderRadius: '8px',
+                              color: '#F9FAFB'
+                            }}
+                            formatter={(value: number, name: string, props: any) => [
+                              formatCurrency(value),
+                              `${props.payload.year} Net Profit`
+                            ]}
+                          />
+                          {selectedYears.map((year, index) => (
+                            <Area
+                              key={year}
+                              type="monotone"
+                              dataKey={`netProfit${year}`}
+                              stroke={`hsl(${index * 120}, 70%, 50%)`}
+                              fill={`hsl(${index * 120}, 70%, 20%)`}
+                              strokeWidth={2}
+                              name={`${year} Net Profit`}
+                            />
+                          ))}
+                        </AreaChart>
+                      </ResponsiveContainer>
+                    </div>
+
+                    {/* ROE Comparison */}
+                    <div>
+                      <h3 className="text-lg font-semibold text-white mb-4">ROE Comparison (%)</h3>
+                      <ResponsiveContainer width="100%" height={300}>
+                        <LineChart data={comparisonChartData}>
+                          <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                          <XAxis dataKey="period" stroke="#9CA3AF" angle={-45} textAnchor="end" height={80} />
+                          <YAxis stroke="#9CA3AF" />
+                          <Tooltip
+                            contentStyle={{
+                              backgroundColor: '#1F2937',
+                              border: '1px solid #374151',
+                              borderRadius: '8px',
+                              color: '#F9FAFB'
+                            }}
+                            formatter={(value: number, name: string, props: any) => [
+                              `${value.toFixed(2)}%`,
+                              `${props.payload.year} ROE`
+                            ]}
+                          />
+                          {selectedYears.map((year, index) => (
+                            <Line
+                              key={year}
+                              type="monotone"
+                              dataKey={`roe${year}`}
+                              stroke={`hsl(${index * 120 + 60}, 70%, 50%)`}
+                              strokeWidth={3}
+                              dot={{ fill: `hsl(${index * 120 + 60}, 70%, 50%)`, strokeWidth: 2, r: 4 }}
+                              name={`${year} ROE`}
+                            />
+                          ))}
+                        </LineChart>
+                      </ResponsiveContainer>
+                    </div>
+
+                    {/* Outstanding Shares Comparison */}
+                    <div>
+                      <h3 className="text-lg font-semibold text-white mb-4">Outstanding Shares Comparison</h3>
+                      <ResponsiveContainer width="100%" height={300}>
+                        <BarChart data={comparisonChartData}>
+                          <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                          <XAxis dataKey="period" stroke="#9CA3AF" angle={-45} textAnchor="end" height={80} />
+                          <YAxis stroke="#9CA3AF" />
+                          <Tooltip
+                            contentStyle={{
+                              backgroundColor: '#1F2937',
+                              border: '1px solid #374151',
+                              borderRadius: '8px',
+                              color: '#F9FAFB'
+                            }}
+                            formatter={(value: number, name: string, props: any) => [
+                              value.toLocaleString(),
+                              `${props.payload.year} Shares`
+                            ]}
+                          />
+                          {selectedYears.map((year, index) => (
+                            <Bar
+                              key={year}
+                              dataKey={`outstandingShares${year}`}
+                              fill={`hsl(${index * 120 + 30}, 70%, 50%)`}
+                              name={`${year} Shares`}
+                            />
+                          ))}
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </div>
+
+                  {/* Year-over-Year Growth Analysis */}
+                  <div className="bg-gradient-to-r from-purple-500/10 to-blue-500/10 rounded-xl p-6 border border-purple-500/20">
+                    <h3 className="text-xl font-bold text-white mb-4">Year-over-Year Growth Analysis</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                      {selectedYears.slice(0, -1).map((year, index) => {
+                        const nextYear = selectedYears[index + 1];
+                        const currentYearData = quarterlyComparisonData.find(y => y.year === year);
+                        const nextYearData = quarterlyComparisonData.find(y => y.year === nextYear);
+
+                        if (!currentYearData || !nextYearData) return null;
+
+                        const priceGrowth = ((nextYearData.avgPrice - currentYearData.avgPrice) / currentYearData.avgPrice) * 100;
+                        const epsGrowth = ((nextYearData.avgEPS - currentYearData.avgEPS) / currentYearData.avgEPS) * 100;
+                        const profitGrowth = ((nextYearData.avgNetProfit - currentYearData.avgNetProfit) / currentYearData.avgNetProfit) * 100;
+                        const roeChange = nextYearData.avgROE - currentYearData.avgROE;
+
+                        return (
+                          <div key={`${year}-${nextYear}`} className="bg-white/5 rounded-xl p-4">
+                            <h4 className="text-white font-semibold mb-3">{year} → {nextYear}</h4>
+                            <div className="space-y-2">
+                              <div className="flex justify-between">
+                                <span className="text-white/70 text-sm">Price:</span>
+                                <span className={`font-semibold ${priceGrowth >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                                  {priceGrowth >= 0 ? '+' : ''}{priceGrowth.toFixed(1)}%
+                                </span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="text-white/70 text-sm">EPS:</span>
+                                <span className={`font-semibold ${epsGrowth >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                                  {epsGrowth >= 0 ? '+' : ''}{epsGrowth.toFixed(1)}%
+                                </span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="text-white/70 text-sm">Profit:</span>
+                                <span className={`font-semibold ${profitGrowth >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                                  {profitGrowth >= 0 ? '+' : ''}{profitGrowth.toFixed(1)}%
+                                </span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="text-white/70 text-sm">ROE:</span>
+                                <span className={`font-semibold ${roeChange >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                                  {roeChange >= 0 ? '+' : ''}{roeChange.toFixed(1)}%
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
                 </div>
               )}
             </div>
