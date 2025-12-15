@@ -770,9 +770,9 @@ export default function IssuerDetailsPage() {
                               borderRadius: '8px',
                               color: '#F9FAFB'
                             }}
-                            formatter={(value: number, name: string, props: any) => [
+                            formatter={(value: number, name: string) => [
                               formatCurrency(value),
-                              `${props.payload.year} Price`
+                              name
                             ]}
                           />
                           {selectedYears.map((year, index) => (
@@ -805,9 +805,9 @@ export default function IssuerDetailsPage() {
                               borderRadius: '8px',
                               color: '#F9FAFB'
                             }}
-                            formatter={(value: number, name: string, props: any) => [
+                            formatter={(value: number, name: string) => [
                               formatCurrency(value),
-                              `${props.payload.year} EPS`
+                              name
                             ]}
                           />
                           {selectedYears.map((year, index) => (
@@ -837,9 +837,9 @@ export default function IssuerDetailsPage() {
                               borderRadius: '8px',
                               color: '#F9FAFB'
                             }}
-                            formatter={(value: number, name: string, props: any) => [
+                            formatter={(value: number, name: string) => [
                               formatCurrency(value),
-                              `${props.payload.year} Net Profit`
+                              name
                             ]}
                           />
                           {selectedYears.map((year, index) => (
@@ -872,9 +872,9 @@ export default function IssuerDetailsPage() {
                               borderRadius: '8px',
                               color: '#F9FAFB'
                             }}
-                            formatter={(value: number, name: string, props: any) => [
+                            formatter={(value: number, name: string) => [
                               `${value.toFixed(2)}%`,
-                              `${props.payload.year} ROE`
+                              name
                             ]}
                           />
                           {selectedYears.map((year, index) => (
@@ -907,9 +907,9 @@ export default function IssuerDetailsPage() {
                               borderRadius: '8px',
                               color: '#F9FAFB'
                             }}
-                            formatter={(value: number, name: string, props: any) => [
+                            formatter={(value: number, name: string) => [
                               value.toLocaleString(),
-                              `${props.payload.year} Shares`
+                              name
                             ]}
                           />
                           {selectedYears.map((year, index) => (
