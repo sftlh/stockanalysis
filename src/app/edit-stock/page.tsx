@@ -25,6 +25,9 @@ export default function EditStockPage() {
   const router = useRouter()
   const [stocks, setStocks] = useState<StockData[]>([])
   const [loading, setLoading] = useState(true)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
   const [editing, setEditing] = useState<StockData | null>(null)
   const [form, setForm] = useState<Partial<StockData>>({})
   const [showToast, setShowToast] = useState(false)
@@ -44,6 +47,20 @@ export default function EditStockPage() {
     fetchStocks()
     return () => { mounted = false }
   }, [])
+
+  // Reset page when search or page size changes
+  useEffect(() => {
+    setPage(1)
+  }, [searchQuery, pageSize])
+
+  const filteredStocks = stocks.filter(s => {
+    const q = searchQuery.trim().toLowerCase()
+    if (!q) return true
+    return s.issuerName.toLowerCase().includes(q) || (s.sector || '').toLowerCase().includes(q) || String(s.year).includes(q)
+  })
+
+  const totalPages = Math.max(1, Math.ceil(filteredStocks.length / pageSize))
+  const paginatedStocks = filteredStocks.slice((page - 1) * pageSize, page * pageSize)
 
   const openEdit = (s: StockData) => {
     setEditing(s)
@@ -118,8 +135,28 @@ export default function EditStockPage() {
           {loading ? (
             <div className="text-white">Loading...</div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-left">
+            <>
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
+                <div className="flex items-center gap-3">
+                  <input
+                    type="text"
+                    placeholder="Search issuer, sector, or year..."
+                    value={searchQuery}
+                    onChange={e => setSearchQuery(e.target.value)}
+                    className="px-3 py-2 rounded bg-gray-800 text-white placeholder-gray-400 focus:outline-none"
+                  />
+                  <select value={pageSize} onChange={e => setPageSize(parseInt(e.target.value || '10'))} className="px-3 py-2 rounded bg-gray-800 text-white">
+                    <option value={5}>5 / page</option>
+                    <option value={10}>10 / page</option>
+                    <option value={25}>25 / page</option>
+                    <option value={50}>50 / page</option>
+                  </select>
+                </div>
+                <div className="text-white/70 text-sm">Showing {filteredStocks.length} result{filteredStocks.length !== 1 ? 's' : ''}</div>
+              </div>
+
+              <div className="overflow-x-auto">
+                <table className="w-full text-left">
                 <thead>
                   <tr className="text-white/80">
                     <th className="py-2 px-3">Issuer</th>
@@ -133,23 +170,48 @@ export default function EditStockPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {stocks.map(s => (
-                    <tr key={s.id} className="border-t border-white/5">
-                      <td className="py-2 px-3 text-white">{s.issuerName}</td>
-                      <td className="py-2 px-3 text-white">Q{s.quarter}</td>
-                      <td className="py-2 px-3 text-white">{s.year}</td>
-                      <td className="py-2 px-3 text-white">{formatCurrency(s.currentPrice)}</td>
-                      <td className="py-2 px-3 text-white">{s.eps}</td>
-                      <td className="py-2 px-3 text-white">{formatCurrency(s.netProfit)}</td>
-                      <td className="py-2 px-3 text-white">{s.outstandingShares.toLocaleString()}</td>
-                      <td className="py-2 px-3">
-                        <button className="btn-secondary" onClick={() => openEdit(s)}>Edit</button>
-                      </td>
+                  {paginatedStocks.length === 0 ? (
+                    <tr>
+                      <td colSpan={8} className="py-6 text-center text-white/60">No results found.</td>
                     </tr>
-                  ))}
+                  ) : (
+                    paginatedStocks.map(s => (
+                      <tr key={s.id} className="border-t border-white/5">
+                        <td className="py-2 px-3 text-white">{s.issuerName}</td>
+                        <td className="py-2 px-3 text-white">Q{s.quarter}</td>
+                        <td className="py-2 px-3 text-white">{s.year}</td>
+                        <td className="py-2 px-3 text-white">{formatCurrency(s.currentPrice)}</td>
+                        <td className="py-2 px-3 text-white">{s.eps}</td>
+                        <td className="py-2 px-3 text-white">{formatCurrency(s.netProfit)}</td>
+                        <td className="py-2 px-3 text-white">{s.outstandingShares.toLocaleString()}</td>
+                        <td className="py-2 px-3">
+                          <button className="btn-secondary" onClick={() => openEdit(s)}>Edit</button>
+                        </td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>
+
+              {/* Pagination controls */}
+              <div className="mt-4 flex items-center justify-between">
+                <div className="text-white/70 text-sm">Page {page} of {totalPages}</div>
+                <div className="flex items-center gap-2">
+                  <button
+                    className="btn-outline"
+                    onClick={() => setPage(p => Math.max(1, p - 1))}
+                    disabled={page <= 1}
+                  >Prev</button>
+                  <div className="text-white/80 px-2">|</div>
+                  <button
+                    className="btn-outline"
+                    onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                    disabled={page >= totalPages}
+                  >Next</button>
+                </div>
+              </div>
+            </>
           )}
         </div>
 
