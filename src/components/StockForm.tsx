@@ -97,6 +97,9 @@ export default function StockForm({ onSubmit }: StockFormProps) {
           year: new Date().getFullYear()
         })
         onSubmit()
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('stockdata:changed'))
+        }
       } else {
         const errorData = await response.json()
         alert(errorData.error || 'Failed to add stock data')

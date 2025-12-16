@@ -100,6 +100,21 @@ export default function BookmarkedIssuersList() {
     };
 
     fetchBookmarkedIssuers();
+
+    // Listen for global stock data changes (e.g., new reports added)
+    const onStockDataChanged = () => {
+      fetchBookmarkedIssuers();
+    };
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('stockdata:changed', onStockDataChanged);
+    }
+
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('stockdata:changed', onStockDataChanged);
+      }
+    };
   }, []);
 
   const handleIssuerClick = (issuerName: string) => {

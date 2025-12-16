@@ -311,6 +311,15 @@ export default function Home() {
               </svg>
               My Bookmarks
             </button>
+            <button
+              onClick={() => router.push('/edit-stock')}
+              className="btn-secondary flex items-center justify-center gap-3 py-4 px-6 rounded-xl font-semibold transition-all duration-300 hover:scale-105"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5h6M6 12h12M6 19h12" />
+              </svg>
+              Edit Stocks
+            </button>
           </div>
         </div>
 
