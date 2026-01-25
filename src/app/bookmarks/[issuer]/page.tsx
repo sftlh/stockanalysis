@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { formatCurrency } from '@/lib/currency';
+import { formatCurrency, formatCurrencyCompact } from '@/lib/currency';
 import {
   LineChart,
   Line,
@@ -23,11 +23,15 @@ interface StockData {
   id: number;
   issuerName: string;
   netProfit: number;
+  revenue?: number;
+  operatingCashFlow?: number;
   eps: number;
   outstandingShares: number;
   currentPrice: number;
   totalEquity: number;
   totalDebt: number;
+  currentAssets?: number;
+  currentLiabilities?: number;
   dividends: number;
   quarter: number;
   year: number;
@@ -110,6 +114,8 @@ export default function IssuerDetailsPage() {
         price: stock.currentPrice,
         eps: stock.eps,
         netProfit: stock.netProfit,
+        revenue: stock.revenue || 0,
+        operatingCashFlow: stock.operatingCashFlow || 0,
         per: per || 0,
         roe: roe || 0,
         pbv: pbv || 0,
@@ -361,6 +367,36 @@ export default function IssuerDetailsPage() {
                   </ResponsiveContainer>
                 </div>
 
+                {/* Revenue & OCF Trend */}
+                <div>
+                  <h3 className="text-lg font-semibold text-white mb-4">Revenue & OCF Trend</h3>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <ComposedChart data={performanceChartData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                      <XAxis dataKey="period" stroke="#9CA3AF" />
+                      <YAxis stroke="#9CA3AF" />
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: '#1F2937',
+                          border: '1px solid #374151',
+                          borderRadius: '8px',
+                          color: '#F9FAFB'
+                        }}
+                        formatter={(value: number, name: string) => [formatCurrencyCompact(value), name]}
+                      />
+                      <Bar dataKey="revenue" fill="#3B82F6" name="Revenue" />
+                      <Line
+                        type="monotone"
+                        dataKey="operatingCashFlow"
+                        stroke="#10B981"
+                        strokeWidth={2}
+                        name="Cash Flow"
+                        dot={{ fill: '#10B981', r: 4 }}
+                      />
+                    </ComposedChart>
+                  </ResponsiveContainer>
+                </div>
+
                 {/* EPS Trend */}
                 <div>
                   <h3 className="text-lg font-semibold text-white mb-4">EPS Trend</h3>
@@ -516,6 +552,45 @@ export default function IssuerDetailsPage() {
 
                 <div className="bg-white/5 rounded-xl p-6">
                   <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-semibold text-white">Liquidity & Health</h3>
+                    <svg className="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <div className="space-y-3">
+                    <div className="flex justify-between">
+                      <span className="text-white/70">Current Ratio:</span>
+                       <span className={`font-semibold ${
+                        latestStock.currentAssets && latestStock.currentLiabilities && (latestStock.currentAssets / latestStock.currentLiabilities) > 1.5 
+                        ? 'text-green-400' 
+                        : latestStock.currentAssets && latestStock.currentLiabilities && (latestStock.currentAssets / latestStock.currentLiabilities) >= 1
+                          ? 'text-yellow-400' 
+                          : 'text-red-400'
+                      }`}>
+                        {latestStock.currentAssets && latestStock.currentLiabilities ? (latestStock.currentAssets / latestStock.currentLiabilities).toFixed(2) : 'N/A'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-white/70">Net Margin:</span>
+                      <span className={`font-semibold ${
+                        latestStock.revenue && latestStock.revenue > 0 ? ((latestStock.netProfit / latestStock.revenue) * 100) > 10 ? 'text-green-400' : 'text-yellow-400' : 'text-white'
+                      }`}>
+                         {latestStock.revenue && latestStock.revenue > 0 ? ((latestStock.netProfit / latestStock.revenue) * 100).toFixed(1) + '%' : 'N/A'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-white/70">Cash Flow:</span>
+                      <span className={`font-semibold ${
+                        latestStock.operatingCashFlow && latestStock.operatingCashFlow > 0 ? 'text-green-400' : 'text-red-400'
+                      }`}>
+                        {latestStock.operatingCashFlow ? (latestStock.operatingCashFlow > 0 ? '+' : '') + formatCurrencyCompact(latestStock.operatingCashFlow) : 'N/A'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-white/5 rounded-xl p-6">
+                  <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-semibold text-white">Risk Assessment</h3>
                     <svg className="w-6 h-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
@@ -574,6 +649,12 @@ export default function IssuerDetailsPage() {
                       {latestStock.eps > 0 && (
                         <li>• Positive EPS indicates earnings capability</li>
                       )}
+                      {latestStock.operatingCashFlow && latestStock.operatingCashFlow > 0 && (
+                        <li>• Positive Operating Cash Flow shows healthy operations</li>
+                      )}
+                       {latestStock.currentAssets && latestStock.currentLiabilities && (latestStock.currentAssets / latestStock.currentLiabilities) > 1.5 && (
+                        <li>• Strong liquidity position (Current Ratio {'>'} 1.5)</li>
+                      )}
                     </ul>
                   </div>
                   <div>
@@ -581,6 +662,12 @@ export default function IssuerDetailsPage() {
                     <ul className="text-white/80 space-y-1">
                       {latestStock.totalEquity !== 0 && (latestStock.netProfit / latestStock.totalEquity) * 100 < 5 && (
                         <li>• Low ROE may indicate profitability concerns</li>
+                      )}
+                      {latestStock.operatingCashFlow && latestStock.operatingCashFlow < 0 && (
+                        <li>• Negative Operating Cash Flow is a major red flag</li>
+                      )}
+                       {latestStock.currentAssets && latestStock.currentLiabilities && (latestStock.currentAssets / latestStock.currentLiabilities) < 1 && (
+                        <li>• Liquidity issue: Current Assets less than Liabilities</li>
                       )}
                       {latestStock.totalEquity !== 0 && (latestStock.totalDebt / latestStock.totalEquity) > 2 && (
                         <li>• High debt levels increase financial risk</li>
@@ -1026,6 +1113,18 @@ export default function IssuerDetailsPage() {
                           </div>
                         </div>
                         <div className="bg-white/5 rounded-xl p-4">
+                          <div className="text-sm text-white/60 mb-1">Revenue</div>
+                          <div className="text-xl font-semibold text-white">
+                            {stock.revenue ? formatCurrencyCompact(stock.revenue) : 'N/A'}
+                          </div>
+                        </div>
+                        <div className="bg-white/5 rounded-xl p-4">
+                          <div className="text-sm text-white/60 mb-1">Op. Cash Flow</div>
+                          <div className={`text-xl font-semibold ${stock.operatingCashFlow && stock.operatingCashFlow > 0 ? 'text-green-400' : stock.operatingCashFlow && stock.operatingCashFlow < 0 ? 'text-red-400' : 'text-white'}`}>
+                            {stock.operatingCashFlow ? formatCurrencyCompact(stock.operatingCashFlow) : 'N/A'}
+                          </div>
+                        </div>
+                        <div className="bg-white/5 rounded-xl p-4">
                           <div className="text-sm text-white/60 mb-1">EPS</div>
                           <div className="text-xl font-semibold text-white">
                             {formatCurrency(stock.eps)}
@@ -1058,6 +1157,14 @@ export default function IssuerDetailsPage() {
                         <div className="bg-white/5 rounded-xl p-4">
                           <div className="text-sm text-white/60 mb-1">DER</div>
                           <div className="text-xl font-semibold text-white">{der}</div>
+                        </div>
+                        <div className="bg-white/5 rounded-xl p-4">
+                          <div className="text-sm text-white/60 mb-1">Current Ratio</div>
+                          <div className={`text-xl font-semibold ${
+                            stock.currentAssets && stock.currentLiabilities && (stock.currentAssets / stock.currentLiabilities) < 1 ? 'text-red-400' : 'text-white'
+                          }`}>
+                            {stock.currentAssets && stock.currentLiabilities ? (stock.currentAssets / stock.currentLiabilities).toFixed(2) : 'N/A'}
+                          </div>
                         </div>
                       </div>
                     </div>

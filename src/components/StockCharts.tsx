@@ -8,6 +8,8 @@ interface StockData {
   id: number
   issuerName: string
   netProfit: number
+  revenue?: number
+  operatingCashFlow?: number
   eps: number
   outstandingShares: number
   currentPrice: number

@@ -9,11 +9,15 @@ interface StockData {
   id: number
   issuerName: string
   netProfit: number
+  revenue?: number
+  operatingCashFlow?: number
   eps: number
   outstandingShares: number
   currentPrice: number
   totalEquity: number
   totalDebt: number
+  currentAssets?: number
+  currentLiabilities?: number
   dividends: number
   quarter: number
   year: number
@@ -236,6 +240,14 @@ export default function EditStockPage() {
                   <input type="number" value={form.netProfit ?? ''} onChange={e => handleChange('netProfit', parseFloat(e.target.value || '0'))} className="w-full p-2 rounded bg-gray-800 text-white mt-1" />
                 </div>
                 <div>
+                  <label className="text-white/70">Revenue</label>
+                  <input type="number" value={form.revenue ?? ''} onChange={e => handleChange('revenue', parseFloat(e.target.value || '0'))} className="w-full p-2 rounded bg-gray-800 text-white mt-1" />
+                </div>
+                <div>
+                  <label className="text-white/70">Operating Cash Flow</label>
+                  <input type="number" value={form.operatingCashFlow ?? ''} onChange={e => handleChange('operatingCashFlow', parseFloat(e.target.value || '0'))} className="w-full p-2 rounded bg-gray-800 text-white mt-1" />
+                </div>
+                <div>
                   <label className="text-white/70">Outstanding Shares</label>
                   <input type="number" value={form.outstandingShares ?? ''} onChange={e => handleChange('outstandingShares', parseInt(e.target.value || '0'))} className="w-full p-2 rounded bg-gray-800 text-white mt-1" />
                 </div>
@@ -246,6 +258,14 @@ export default function EditStockPage() {
                 <div>
                   <label className="text-white/70">Total Debt</label>
                   <input type="number" value={form.totalDebt ?? ''} onChange={e => handleChange('totalDebt', parseFloat(e.target.value || '0'))} className="w-full p-2 rounded bg-gray-800 text-white mt-1" />
+                </div>
+                <div>
+                  <label className="text-white/70">Current Assets</label>
+                  <input type="number" value={form.currentAssets ?? ''} onChange={e => handleChange('currentAssets', parseFloat(e.target.value || '0'))} className="w-full p-2 rounded bg-gray-800 text-white mt-1" />
+                </div>
+                <div>
+                  <label className="text-white/70">Current Liabilities</label>
+                  <input type="number" value={form.currentLiabilities ?? ''} onChange={e => handleChange('currentLiabilities', parseFloat(e.target.value || '0'))} className="w-full p-2 rounded bg-gray-800 text-white mt-1" />
                 </div>
                 <div>
                   <label className="text-white/70">Quarter</label>
@@ -266,7 +286,7 @@ export default function EditStockPage() {
               </div>
               <div className="mt-4 bg-white/5 p-3 rounded">
                 <div className="text-sm text-white/70">Schema reference:</div>
-                <pre className="text-xs text-white/60">{`netProfit: number\neps: number\noutstandingShares: number\ncurrentPrice: number\ntotalEquity: number\ntotalDebt: number\ndividends: number\nquarter: 1-4\nyear: number\nsector: string`}</pre>
+                <pre className="text-xs text-white/60">{`netProfit: number\nrevenue: number\noperatingCashFlow: number\neps: number\noutstandingShares: number\ncurrentPrice: number\ntotalEquity: number\ntotalDebt: number\ncurrentAssets: number\ncurrentLiabilities: number\ndividends: number\nquarter: 1-4\nyear: number\nsector: string`}</pre>
               </div>
             </div>
           </div>

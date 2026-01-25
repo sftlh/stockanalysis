@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "StockData" ADD COLUMN     "currentAssets" DOUBLE PRECISION NOT NULL DEFAULT 0,
+ADD COLUMN     "currentLiabilities" DOUBLE PRECISION NOT NULL DEFAULT 0;

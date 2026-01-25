@@ -8,11 +8,15 @@ interface StockData {
   issuerName: string;
   sector: string;
   netProfit: number;
+  revenue: number;
+  operatingCashFlow: number;
   eps: number;
   outstandingShares: number;
   currentPrice: number;
   totalEquity: number;
   totalDebt: number;
+  currentAssets?: number;
+  currentLiabilities?: number;
   dividends: number;
   quarter: number;
   year: number;
@@ -91,8 +95,14 @@ export default function SectorComparisonTable() {
     const badROE = stock.roe < 5 // Poor profitability
     const badDER = stock.der > 2.0 // High debt risk
 
-    // Consider it bad if it meets at least 1 out of 2 key criteria
-    return badROE || badDER
+    // Check Current Ratio (Liquidity Risk)
+    let badLiquidity = false
+    if (stock.currentAssets !== undefined && stock.currentLiabilities !== undefined && stock.currentLiabilities !== 0) {
+      badLiquidity = (stock.currentAssets / stock.currentLiabilities) < 1
+    }
+
+    // Consider it bad if it meets at least 1 out of these key criteria
+    return badROE || badDER || badLiquidity
   }
 
   const sectorGroups = useMemo(() => {
@@ -591,6 +601,15 @@ export default function SectorComparisonTable() {
                     Price
                   </th>
                   <th className="px-6 py-4 text-left text-sm font-bold text-white/80 uppercase tracking-wider">
+                    Revenue
+                  </th>
+                  <th className="px-6 py-4 text-left text-sm font-bold text-white/80 uppercase tracking-wider">
+                    NPM
+                  </th>
+                  <th className="px-6 py-4 text-left text-sm font-bold text-white/80 uppercase tracking-wider">
+                    OCF
+                  </th>
+                  <th className="px-6 py-4 text-left text-sm font-bold text-white/80 uppercase tracking-wider">
                     PER
                   </th>
                   <th className="px-6 py-4 text-left text-sm font-bold text-white/80 uppercase tracking-wider">
@@ -607,6 +626,9 @@ export default function SectorComparisonTable() {
                   </th>
                   <th className="px-6 py-4 text-left text-sm font-bold text-white/80 uppercase tracking-wider">
                     DER
+                  </th>
+                  <th className="px-6 py-4 text-left text-sm font-bold text-white/80 uppercase tracking-wider">
+                    Current Ratio
                   </th>
                   <th className="px-6 py-4 text-left text-sm font-bold text-white/80 uppercase tracking-wider">
                     ROE
@@ -638,6 +660,15 @@ export default function SectorComparisonTable() {
                       {formatCurrency(stock.currentPrice)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-lg text-white/90 font-medium">
+                      {stock.revenue ? formatCurrencyCompact(stock.revenue) : '-'}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-lg text-white/90 font-medium">
+                      {stock.revenue && stock.netProfit ? ((stock.netProfit / stock.revenue) * 100).toFixed(2) + '%' : '-'}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-lg text-white/90 font-medium">
+                      {stock.operatingCashFlow ? formatCurrencyCompact(stock.operatingCashFlow) : '-'}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-lg text-white/90 font-medium">
                       {stock.per > 0 ? stock.per.toFixed(2) : 'N/A'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-lg text-white/90 font-medium">
@@ -654,6 +685,16 @@ export default function SectorComparisonTable() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-lg text-white/90 font-medium">
                       {stock.der >= 0 ? stock.der.toFixed(2) : 'N/A'}
+                    </td>
+                    <td className={`px-6 py-4 whitespace-nowrap text-lg font-medium ${
+                      (stock.currentAssets && stock.currentLiabilities && (stock.currentAssets / stock.currentLiabilities) < 1) 
+                        ? 'text-red-400' 
+                        : 'text-white/90'
+                    }`}>
+                      {stock.currentAssets && stock.currentLiabilities && stock.currentLiabilities !== 0
+                        ? (stock.currentAssets / stock.currentLiabilities).toFixed(2) 
+                        : 'N/A'
+                      }
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-lg text-white/90 font-medium">
                       {!isNaN(stock.roe) ? `${stock.roe.toFixed(1)}%` : 'N/A'}

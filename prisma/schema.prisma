@@ -29,11 +29,15 @@ model StockData {
   issuerName         String
   sector             String?
   netProfit          Float
+  revenue            Float   @default(0)
+  operatingCashFlow  Float   @default(0)
   eps                Float
   outstandingShares  BigInt
   currentPrice       Float
   totalEquity        Float
   totalDebt          Float
+  currentAssets      Float   @default(0)
+  currentLiabilities Float   @default(0)
   dividends          Float
   quarter            Int
   year               Int

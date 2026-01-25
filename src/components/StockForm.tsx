@@ -6,10 +6,14 @@ interface StockData {
   issuerName: string
   sector: string
   netProfit: number
+  revenue: number
+  operatingCashFlow: number
   eps: number
   currentPrice: number
   totalEquity: number
   totalDebt: number
+  currentAssets: number
+  currentLiabilities: number
   dividends: number
   quarter: number
   year: number
@@ -24,10 +28,14 @@ export default function StockForm({ onSubmit }: StockFormProps) {
     issuerName: '',
     sector: '',
     netProfit: 0,
+    revenue: 0,
+    operatingCashFlow: 0,
     eps: 0,
     currentPrice: 0,
     totalEquity: 0,
     totalDebt: 0,
+    currentAssets: 0,
+    currentLiabilities: 0,
     dividends: 0,
     quarter: 1,
     year: new Date().getFullYear()
@@ -88,10 +96,14 @@ export default function StockForm({ onSubmit }: StockFormProps) {
           issuerName: '',
           sector: '',
           netProfit: 0,
+          revenue: 0,
+          operatingCashFlow: 0,
           eps: 0,
           currentPrice: 0,
           totalEquity: 0,
           totalDebt: 0,
+          currentAssets: 0,
+          currentLiabilities: 0,
           dividends: 0,
           quarter: 1,
           year: new Date().getFullYear()
@@ -166,6 +178,28 @@ export default function StockForm({ onSubmit }: StockFormProps) {
           />
         </div>
         <div>
+          <label className="block text-sm font-semibold text-white/90 mb-3">Revenue (Rp)</label>
+          <input
+            type="number"
+            step="0.01"
+            name="revenue"
+            value={formData.revenue}
+            onChange={handleChange}
+            className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-white/50 transition-all duration-300"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-semibold text-white/90 mb-3">Operating Cash Flow (Rp)</label>
+          <input
+            type="number"
+            step="0.01"
+            name="operatingCashFlow"
+            value={formData.operatingCashFlow}
+            onChange={handleChange}
+            className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-white/50 transition-all duration-300"
+          />
+        </div>
+        <div>
           <label className="block text-sm font-semibold text-white/90 mb-3">EPS (Rp) *</label>
           <input
             type="number"
@@ -210,6 +244,28 @@ export default function StockForm({ onSubmit }: StockFormProps) {
             value={formData.totalDebt}
             onChange={handleChange}
             required
+            className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-white/50 transition-all duration-300"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-semibold text-white/90 mb-3">Current Assets (Rp)</label>
+          <input
+            type="number"
+            step="0.01"
+            name="currentAssets"
+            value={formData.currentAssets}
+            onChange={handleChange}
+            className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-white/50 transition-all duration-300"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-semibold text-white/90 mb-3">Current Liabilities (Rp)</label>
+          <input
+            type="number"
+            step="0.01"
+            name="currentLiabilities"
+            value={formData.currentLiabilities}
+            onChange={handleChange}
             className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-white/50 transition-all duration-300"
           />
         </div>
